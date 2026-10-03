@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="13" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-03T18:54:16" hostname="localhost">
+  <testsuite name="com.stringsaeed.azkarify.AppFlowTest" tests="8" failures="0" errors="0" skipped="0" time="29.220" timestamp="2026-10-03T18:54:16" hostname="localhost">
+    <properties>
+      <property name="device" value="emulator-5554" />
+    </properties>
+    <testcase name="journeyCompletionAwardsPointsAndSurvivesRecreation" classname="com.stringsaeed.azkarify.AppFlowTest" time="6.004" />
+    <testcase name="returningFromScreensDoesNotFocusSearch" classname="com.stringsaeed.azkarify.AppFlowTest" time="4.307" />
+    <testcase name="searchOnlyFocusesAfterATapAndReleasesFocusOnSubmit" classname="com.stringsaeed.azkarify.AppFlowTest" time="3.389" />
+    <testcase name="adaptivePanesKeepSelectionAndSearchAcrossRecreation" classname="com.stringsaeed.azkarify.AppFlowTest" time="2.946" />
+    <testcase name="languageAndThemePersistAfterActivityRecreation" classname="com.stringsaeed.azkarify.AppFlowTest" time="2.911" />
+    <testcase name="materialSearchFiltersAndClearsTheList" classname="com.stringsaeed.azkarify.AppFlowTest" time="2.946" />
+    <testcase name="favoritesSearchReadingCounterAndArabicSettingsWork" classname="com.stringsaeed.azkarify.AppFlowTest" time="3.001" />
+    <testcase name="reminderTimePickerSavesAndCancelsDrafts" classname="com.stringsaeed.azkarify.AppFlowTest" time="3.716" />
+  </testsuite>
+  <testsuite name="com.stringsaeed.azkarify.StorageTest" tests="5" failures="0" errors="0" skipped="0" time="0.417" timestamp="2026-10-03T18:54:16" hostname="localhost">
+    <properties>
+      <property name="device" value="emulator-5554" />
+    </properties>
+    <testcase name="wrongPreferenceTypesUseSafeDefaults" classname="com.stringsaeed.azkarify.StorageTest" time="0.045" />
+    <testcase name="datastoreMigratesExistingProgressWithoutRemovingOtherPreferences" classname="com.stringsaeed.azkarify.StorageTest" time="0.046" />
+    <testcase name="concurrentRepositoryReadsReturnCompleteBilingualContent" classname="com.stringsaeed.azkarify.StorageTest" time="0.035" />
+    <testcase name="inexactReminderSchedulesWithoutExactAlarmPermission" classname="com.stringsaeed.azkarify.StorageTest" time="0.012" />
+    <testcase name="concurrentProgressUpdatesKeepEveryStepAndAward" classname="com.stringsaeed.azkarify.StorageTest" time="0.279" />
+  </testsuite>
+</testsuites>

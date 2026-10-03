@@ -1,0 +1,138 @@
+[
+  {
+    "id": "morning",
+    "steps": [
+      {
+        "id": "wake",
+        "categories": [
+          1
+        ],
+        "optional": false,
+        "options": [],
+        "title": "Wake up",
+        "note": ""
+      },
+      {
+        "id": "wudu",
+        "categories": [
+          8,
+          9
+        ],
+        "optional": false,
+        "options": [],
+        "title": "Make wudu",
+        "note": ""
+      },
+      {
+        "id": "morning-azkar",
+        "categories": [
+          27
+        ],
+        "optional": false,
+        "options": [],
+        "title": "Morning azkar",
+        "note": ""
+      },
+      {
+        "id": "prayer",
+        "categories": [],
+        "optional": false,
+        "options": [
+          {
+            "id": "subh",
+            "title": "Subh"
+          },
+          {
+            "id": "duha",
+            "title": "Duha"
+          }
+        ],
+        "title": "Pray Subh or Duha",
+        "note": "Choose the prayer for this routine."
+      }
+    ],
+    "title": "A gentle morning",
+    "subtitle": "Wake, prepare, and begin with remembrance"
+  },
+  {
+    "id": "going-out",
+    "steps": [
+      {
+        "id": "leave-home",
+        "categories": [
+          10
+        ],
+        "optional": false,
+        "options": [],
+        "title": "Leaving home azkar",
+        "note": ""
+      },
+      {
+        "id": "ride",
+        "categories": [
+          95
+        ],
+        "optional": true,
+        "options": [],
+        "title": "Azkar when setting out",
+        "note": "If you are riding in a vehicle."
+      }
+    ],
+    "title": "Heading out",
+    "subtitle": "A moment of remembrance before your day outside"
+  },
+  {
+    "id": "evening",
+    "steps": [
+      {
+        "id": "evening-azkar",
+        "categories": [
+          27
+        ],
+        "optional": false,
+        "options": [],
+        "title": "Evening azkar",
+        "note": ""
+      }
+    ],
+    "title": "An evening pause",
+    "subtitle": "Make room for your evening azkar"
+  },
+  {
+    "id": "sleep",
+    "steps": [
+      {
+        "id": "sleep-azkar",
+        "categories": [
+          28
+        ],
+        "optional": false,
+        "options": [],
+        "title": "Bedtime azkar",
+        "note": ""
+      },
+      {
+        "id": "night-waking",
+        "categories": [
+          29
+        ],
+        "optional": true,
+        "options": [],
+        "title": "If you wake during the night",
+        "note": ""
+      },
+      {
+        "id": "bad-dream",
+        "categories": [
+          31
+        ],
+        "optional": true,
+        "options": [],
+        "title": "After a troubling dream",
+        "note": ""
+      }
+    ],
+    "title": "Rest with remembrance",
+    "subtitle": "Bedtime azkar, with a little help if you wake"
+  }
+]

@@ -1,0 +1,94 @@
+[
+  {
+    "name": "tablet-portrait",
+    "device": "emulator-5556",
+    "width": 1600,
+    "height": 2560,
+    "listVisible": true,
+    "selectedTopicVisible": true
+  },
+  {
+    "name": "tablet-landscape",
+    "device": "emulator-5556",
+    "width": 2560,
+    "height": 1600,
+    "listVisible": true,
+    "selectedTopicVisible": true
+  },
+  {
+    "name": "tablet-narrow",
+    "device": "emulator-5556",
+    "width": 960,
+    "height": 1600,
+    "listVisible": false,
+    "selectedTopicVisible": true
+  },
+  {
+    "name": "tablet-restored",
+    "device": "emulator-5556",
+    "width": 2560,
+    "height": 1600,
+    "listVisible": true,
+    "selectedTopicVisible": true
+  },
+  {
+    "name": "fold-open",
+    "device": "emulator-5558",
+    "width": 2208,
+    "height": 1840,
+    "listVisible": true,
+    "selectedTopicVisible": true
+  },
+  {
+    "name": "fold-closed",
+    "device": "emulator-5558",
+    "width": 1080,
+    "height": 2092,
+    "listVisible": false,
+    "selectedTopicVisible": true
+  },
+  {
+    "name": "fold-reopened",
+    "device": "emulator-5558",
+    "width": 2208,
+    "height": 1840,
+    "listVisible": true,
+    "selectedTopicVisible": true
+  },
+  {
+    "name": "fold-half-open",
+    "device": "emulator-5558",
+    "width": 2208,
+    "height": 1840,
+    "listVisible": true,
+    "selectedTopicVisible": true
+  },
+  {
+    "name": "fold-tabletop",
+    "device": "emulator-5558",
+    "width": 1840,
+    "height": 2208,
+    "listVisible": true,
+    "selectedTopicVisible": true,
+    "positions": [
+      {
+        "kind": "detail",
+        "bounds": {
+          "left": 79,
+          "top": 316,
+          "right": 1750,
+          "bottom": 474
+        }
+      },
+      {
+        "kind": "list",
+        "bounds": {
+          "left": 43,
+          "top": 1255,
+          "right": 178,
+          "bottom": 1330
+        }
+      }
+    ]
+  }
+]
