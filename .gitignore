@@ -24,3 +24,7 @@ local.properties
 *.jks
 *.keystore
 keystore.properties
+
+# Agent verification scratch (committed proofs live under docs/verification/control-skill)
+.cursor/skills/verify-azkarify-android/artifacts/
+.cursor/skills/verify-azkarify-android/scripts/__pycache__/

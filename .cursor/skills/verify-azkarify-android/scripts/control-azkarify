@@ -1,0 +1,623 @@
+#!/usr/bin/env python3
+"""Drive the Azkarify Android debug app on a disposable emulator.
+
+This helper belongs to .cursor/skills/verify-azkarify-android. It starts one
+AVD named AzkarifyVerify, installs the debug APK, exposes accessibility dump /
+tap / type / screenshot commands, and tears down only the emulator it started.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+PACKAGE = "com.stringsaeed.azkarify"
+ACTIVITY = "com.stringsaeed.azkarify/.MainActivity"
+AVD_NAME = "AzkarifyVerify"
+SYSTEM_IMAGE = "system-images;android-30;google_apis;x86_64"
+STATE_PATH = Path(os.environ.get("AZKARIFY_VERIFY_STATE", "/tmp/azkarify-verify/state.json"))
+DEFAULT_PORT = 5554
+
+
+class ControlError(RuntimeError):
+    pass
+
+
+def skill_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def repo_root() -> Path:
+    override = os.environ.get("AZKARIFY_ANDROID_ROOT")
+    if override:
+        return Path(override).resolve()
+    return skill_root().parents[2]
+
+
+def evidence_dir(feature: str | None = None) -> Path:
+    override = os.environ.get("AZKARIFY_VERIFY_EVIDENCE")
+    if override:
+        path = Path(override)
+    else:
+        path = skill_root() / "artifacts"
+    if feature:
+        path = path / feature
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def sdk_dir() -> Path:
+    env = os.environ.get("ANDROID_HOME") or os.environ.get("ANDROID_SDK_ROOT")
+    if env:
+        return Path(env)
+    local = repo_root() / "local.properties"
+    if local.exists():
+        for line in local.read_text().splitlines():
+            if line.startswith("sdk.dir="):
+                return Path(line.split("=", 1)[1].strip())
+    default = Path.home() / "Android" / "Sdk"
+    if default.exists():
+        return default
+    raise ControlError("Android SDK not found. Set ANDROID_HOME or sdk.dir in local.properties.")
+
+
+def sdk_bin(name: str) -> str:
+    sdk = sdk_dir()
+    candidates = [
+        sdk / "platform-tools" / name,
+        sdk / "emulator" / name,
+        sdk / "cmdline-tools" / "latest" / "bin" / name,
+    ]
+    for path in candidates:
+        if path.exists():
+            return str(path)
+    found = shutil.which(name)
+    if found:
+        return found
+    raise ControlError(f"{name} not found under {sdk}")
+
+
+def run(cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
+    return subprocess.run(cmd, check=False, text=True, capture_output=True, **kwargs)
+
+
+def run_ok(cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
+    result = run(cmd, **kwargs)
+    if result.returncode != 0:
+        raise ControlError(
+            f"command failed ({result.returncode}): {' '.join(cmd)}\n"
+            f"{result.stdout}\n{result.stderr}"
+        )
+    return result
+
+
+def load_state() -> dict:
+    if STATE_PATH.exists():
+        return json.loads(STATE_PATH.read_text())
+    return {}
+
+
+def save_state(state: dict) -> None:
+    STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    STATE_PATH.write_text(json.dumps(state, indent=2) + "\n")
+
+
+def serial_from_state_or_env() -> str:
+    env = os.environ.get("AZKARIFY_VERIFY_SERIAL")
+    if env:
+        return env
+    state = load_state()
+    if state.get("serial"):
+        return state["serial"]
+    raise ControlError("No serial. Run launch first, or set AZKARIFY_VERIFY_SERIAL.")
+
+
+def adb(serial: str, *args: str, timeout: int | None = None) -> subprocess.CompletedProcess:
+    cmd = [sdk_bin("adb"), "-s", serial, *args]
+    return run(cmd, timeout=timeout)
+
+
+def adb_ok(serial: str, *args: str, timeout: int | None = None) -> subprocess.CompletedProcess:
+    result = adb(serial, *args, timeout=timeout)
+    if result.returncode != 0:
+        raise ControlError(
+            f"adb {' '.join(args)} failed ({result.returncode})\n{result.stdout}\n{result.stderr}"
+        )
+    return result
+
+
+def write_local_properties() -> None:
+    path = repo_root() / "local.properties"
+    desired = f"sdk.dir={sdk_dir()}\n"
+    if path.exists() and path.read_text() == desired:
+        return
+    if not path.exists():
+        path.write_text(desired)
+
+
+def ensure_avd() -> None:
+    avd_home = Path.home() / ".android" / "avd" / f"{AVD_NAME}.avd"
+    if avd_home.exists():
+        return
+    avdmanager = sdk_bin("avdmanager")
+    result = run(
+        [
+            avdmanager,
+            "create",
+            "avd",
+            "-n",
+            AVD_NAME,
+            "-k",
+            SYSTEM_IMAGE,
+            "-d",
+            "pixel_6",
+            "--force",
+        ],
+        input="no\n",
+    )
+    if result.returncode != 0:
+        raise ControlError(f"avdmanager failed:\n{result.stdout}\n{result.stderr}")
+    config = avd_home / "config.ini"
+    text = config.read_text() if config.exists() else ""
+    if "hw.ramSize=" in text:
+        text = re.sub(r"^hw.ramSize=.*$", "hw.ramSize=2048", text, flags=re.M)
+    else:
+        text += "\nhw.ramSize=2048\n"
+    if "hw.gpu.enabled=" not in text:
+        text += "hw.gpu.enabled=yes\n"
+    if "hw.gpu.mode=" not in text:
+        text += "hw.gpu.mode=swiftshader_indirect\n"
+    config.write_text(text)
+
+
+def emulator_running_for_avd() -> str | None:
+    emu = sdk_bin("emulator")
+    listed = run([emu, "-list-avds"]).stdout.splitlines()
+    if AVD_NAME not in listed:
+        return None
+    adb_bin = sdk_bin("adb")
+    devices = run([adb_bin, "devices"]).stdout.splitlines()
+    for line in devices:
+        if not line.endswith("\tdevice") and not line.endswith("\toffline"):
+            continue
+        serial = line.split("\t", 1)[0]
+        if not serial.startswith("emulator-"):
+            continue
+        avd = run([adb_bin, "-s", serial, "emu", "avd", "name"])
+        name = (avd.stdout or "").splitlines()[0].strip() if avd.returncode == 0 else ""
+        if name == AVD_NAME:
+            return serial
+    return None
+
+
+def wait_for_boot(serial: str, timeout: int = 240) -> None:
+    adb_ok(serial, "wait-for-device", timeout=timeout)
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        boot = adb(serial, "shell", "getprop", "sys.boot_completed")
+        if boot.stdout.strip() == "1":
+            frozen = adb(serial, "shell", "getprop", "init.svc.bootanim")
+            if frozen.stdout.strip() in {"stopped", ""}:
+                pm = adb(serial, "shell", "pm", "path", "android")
+                if pm.returncode == 0 and "package:" in pm.stdout:
+                    time.sleep(2)
+                    return
+        time.sleep(2)
+    raise ControlError(f"emulator {serial} did not finish booting within {timeout}s")
+
+
+def assemble_debug() -> Path:
+    apk = repo_root() / "app" / "build" / "outputs" / "apk" / "debug" / "app-debug.apk"
+    if apk.exists() and time.time() - apk.stat().st_mtime < 3600 and os.environ.get("AZKARIFY_VERIFY_REBUILD") != "1":
+        return apk
+    write_local_properties()
+    gradle = repo_root() / "gradlew"
+    result = run_ok([str(gradle), ":app:assembleDebug"], cwd=str(repo_root()))
+    if not apk.exists():
+        raise ControlError(f"assembleDebug succeeded but {apk} is missing\n{result.stdout}")
+    return apk
+
+
+def cmd_launch(args: argparse.Namespace) -> int:
+    existing = emulator_running_for_avd()
+    if existing and not args.reuse:
+        raise ControlError(
+            f"AVD {AVD_NAME} is already running as {existing}. "
+            "Refuse to double-drive a shared instance. Pass --reuse only for the instance this run started."
+        )
+    ensure_avd()
+    write_local_properties()
+    serial = existing or f"emulator-{args.port}"
+    started_pid = None
+    if not existing:
+        log_path = Path("/tmp/azkarify-verify/emulator.log")
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log = log_path.open("w")
+        proc = subprocess.Popen(
+            [
+                sdk_bin("emulator"),
+                "-avd",
+                AVD_NAME,
+                "-port",
+                str(args.port),
+                "-no-window",
+                "-no-audio",
+                "-no-boot-anim",
+                "-gpu",
+                "swiftshader_indirect",
+                "-netdelay",
+                "none",
+                "-netspeed",
+                "full",
+            ],
+            stdout=log,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+        started_pid = proc.pid
+        save_state(
+            {
+                "pid": proc.pid,
+                "serial": serial,
+                "port": args.port,
+                "avd": AVD_NAME,
+                "log": str(log_path),
+            }
+        )
+        try:
+            wait_for_boot(serial)
+        except Exception:
+            proc.terminate()
+            raise
+    else:
+        save_state({**load_state(), "serial": existing, "avd": AVD_NAME, "reused": True})
+        serial = existing
+        wait_for_boot(serial)
+
+    apk = assemble_debug()
+    adb_ok(serial, "install", "-r", "-t", str(apk), timeout=180)
+    adb_ok(serial, "shell", "am", "force-stop", PACKAGE)
+    adb_ok(
+        serial,
+        "shell",
+        "am",
+        "start",
+        "-W",
+        "-n",
+        ACTIVITY,
+        "-a",
+        "android.intent.action.MAIN",
+        "-c",
+        "android.intent.category.LAUNCHER",
+    )
+    wait_ready(serial, timeout=60)
+    dismiss_first_run(serial)
+    print(f"ready serial={serial} pid={started_pid or load_state().get('pid')} apk={apk}")
+    return 0
+
+
+def wait_ready(serial: str, timeout: int = 60) -> None:
+    deadline = time.time() + timeout
+    last = ""
+    while time.time() < deadline:
+        dump = dump_nodes(serial)
+        last = " | ".join(n.get("text") or n.get("content-desc") or "" for n in dump[:12])
+        if any(
+            marker in (node.get("text") or "") or marker in (node.get("content-desc") or "")
+            for node in dump
+            for marker in ("Skip", "Search azkar", "Husn", "Not now", "Get started")
+        ):
+            return
+        time.sleep(1)
+    raise ControlError(f"app did not become interactive. dump head: {last}")
+
+
+def dismiss_first_run(serial: str) -> None:
+    deadline = time.time() + 30
+    while time.time() < deadline:
+        dump = dump_nodes(serial)
+        texts = {(n.get("text") or "").strip() for n in dump}
+        if "Skip" in texts:
+            tap_match(serial, text="Skip")
+            time.sleep(1)
+            continue
+        if "Not now" in texts:
+            tap_match(serial, text="Not now")
+            time.sleep(1)
+            continue
+        if any((n.get("content-desc") or "") == "Search azkar" for n in dump) or "Husn" in texts:
+            return
+        time.sleep(0.5)
+    raise ControlError("could not dismiss intro / location sheet")
+
+
+def dump_xml(serial: str) -> str:
+    remote = "/sdcard/azkarify-window.xml"
+    result = adb(serial, "shell", "uiautomator", "dump", remote)
+    if result.returncode != 0:
+        raise ControlError(f"uiautomator dump failed:\n{result.stdout}\n{result.stderr}")
+    pulled = adb_ok(serial, "shell", "cat", remote)
+    return pulled.stdout
+
+
+def dump_nodes(serial: str) -> list[dict]:
+    xml_text = dump_xml(serial)
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError as error:
+        raise ControlError(f"invalid window dump: {error}") from error
+    nodes = []
+    for node in root.iter("node"):
+        bounds = node.attrib.get("bounds") or ""
+        match = re.fullmatch(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", bounds)
+        item = dict(node.attrib)
+        if match:
+            x1, y1, x2, y2 = map(int, match.groups())
+            item["cx"] = (x1 + x2) // 2
+            item["cy"] = (y1 + y2) // 2
+            item["w"] = x2 - x1
+            item["h"] = y2 - y1
+        nodes.append(item)
+    return nodes
+
+
+def find_nodes(
+    nodes: list[dict],
+    *,
+    text: str | None = None,
+    desc: str | None = None,
+    contains: str | None = None,
+) -> list[dict]:
+    found = []
+    for node in nodes:
+        node_text = node.get("text") or ""
+        node_desc = node.get("content-desc") or ""
+        if text is not None and node_text != text:
+            continue
+        if desc is not None and node_desc != desc:
+            continue
+        if contains is not None and contains not in node_text and contains not in node_desc:
+            continue
+        found.append(node)
+    return found
+
+
+def tap_match(
+    serial: str,
+    *,
+    text: str | None = None,
+    desc: str | None = None,
+    contains: str | None = None,
+    index: int = 0,
+) -> dict:
+    nodes = find_nodes(dump_nodes(serial), text=text, desc=desc, contains=contains)
+    visible = [n for n in nodes if n.get("w", 0) > 0 and n.get("h", 0) > 0]
+    if not visible:
+        raise ControlError(f"no visible node text={text!r} desc={desc!r} contains={contains!r}")
+    if index >= len(visible):
+        raise ControlError(f"index {index} out of range ({len(visible)} matches)")
+    node = visible[index]
+    adb_ok(serial, "shell", "input", "tap", str(node["cx"]), str(node["cy"]))
+    return node
+
+
+def wait_for(
+    serial: str,
+    *,
+    text: str | None = None,
+    desc: str | None = None,
+    contains: str | None = None,
+    timeout: int = 20,
+    absent: bool = False,
+) -> list[dict]:
+    deadline = time.time() + timeout
+    last_count = 0
+    while time.time() < deadline:
+        nodes = find_nodes(dump_nodes(serial), text=text, desc=desc, contains=contains)
+        last_count = len(nodes)
+        if absent and not nodes:
+            return []
+        if not absent and nodes:
+            return nodes
+        time.sleep(0.6)
+    raise ControlError(
+        f"wait failed text={text!r} desc={desc!r} contains={contains!r} absent={absent} last_count={last_count}"
+    )
+
+
+def capture_screenshot(serial: str, output: Path) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    raw = subprocess.check_output([sdk_bin("adb"), "-s", serial, "exec-out", "screencap", "-p"])
+    if not raw.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ControlError("screencap did not return a PNG")
+    output.write_bytes(raw)
+
+
+def cmd_doctor(_: argparse.Namespace) -> int:
+    serial = serial_from_state_or_env()
+    devices = run_ok([sdk_bin("adb"), "devices"]).stdout
+    if f"{serial}\tdevice" not in devices:
+        raise ControlError(f"{serial} is not online:\n{devices}")
+    avd = adb(serial, "emu", "avd", "name")
+    avd_name = (avd.stdout or "").splitlines()[0].strip() if avd.returncode == 0 else ""
+    boot = adb_ok(serial, "shell", "getprop", "sys.boot_completed").stdout.strip()
+    sdk_level = adb_ok(serial, "shell", "getprop", "ro.build.version.sdk").stdout.strip()
+    pkg = adb(serial, "shell", "pm", "path", PACKAGE)
+    resumed = adb(serial, "shell", "dumpsys", "activity", "activities").stdout
+    focused = PACKAGE in resumed and "MainActivity" in resumed
+    apk_ok = pkg.returncode == 0 and "package:" in pkg.stdout
+    print(f"serial={serial}")
+    print(f"avd={avd_name or 'unknown'}")
+    print(f"boot_completed={boot}")
+    print(f"sdk={sdk_level}")
+    print(f"package_installed={apk_ok}")
+    print(f"activity_in_dumpsys={focused}")
+    if avd_name and avd_name != AVD_NAME:
+        raise ControlError(f"refusing to drive AVD {avd_name}; expected {AVD_NAME}")
+    if boot != "1" or not apk_ok:
+        raise ControlError("instance is not worth driving")
+    return 0
+
+
+def cmd_dump(args: argparse.Namespace) -> int:
+    serial = serial_from_state_or_env()
+    xml_text = dump_xml(serial)
+    path = Path(args.path) if args.path else evidence_dir() / "window.xml"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(xml_text)
+    nodes = dump_nodes(serial)
+    interesting = [
+        {
+            "text": n.get("text"),
+            "content-desc": n.get("content-desc"),
+            "clickable": n.get("clickable"),
+            "bounds": n.get("bounds"),
+        }
+        for n in nodes
+        if (n.get("text") or n.get("content-desc")) and n.get("w", 0) > 0
+    ]
+    print(json.dumps({"path": str(path), "nodes": interesting[:80]}, indent=2, ensure_ascii=False))
+    return 0
+
+
+def cmd_wait(args: argparse.Namespace) -> int:
+    serial = serial_from_state_or_env()
+    nodes = wait_for(
+        serial,
+        text=args.text,
+        desc=args.desc,
+        contains=args.contains,
+        timeout=args.timeout,
+        absent=args.absent,
+    )
+    print(json.dumps({"count": len(nodes), "first": nodes[:3]}, ensure_ascii=False, default=str))
+    return 0
+
+
+def cmd_tap(args: argparse.Namespace) -> int:
+    serial = serial_from_state_or_env()
+    node = tap_match(
+        serial,
+        text=args.text,
+        desc=args.desc,
+        contains=args.contains,
+        index=args.index,
+    )
+    print(json.dumps({"tapped": node.get("text") or node.get("content-desc"), "bounds": node.get("bounds")}))
+    return 0
+
+
+def cmd_type(args: argparse.Namespace) -> int:
+    serial = serial_from_state_or_env()
+    encoded = args.text.replace(" ", "%s")
+    adb_ok(serial, "shell", "input", "text", encoded)
+    print(f"typed={args.text}")
+    return 0
+
+
+def cmd_key(args: argparse.Namespace) -> int:
+    serial = serial_from_state_or_env()
+    adb_ok(serial, "shell", "input", "keyevent", args.code)
+    print(f"keyevent={args.code}")
+    return 0
+
+
+def cmd_screenshot(args: argparse.Namespace) -> int:
+    serial = serial_from_state_or_env()
+    path = Path(args.path)
+    capture_screenshot(serial, path)
+    print(f"screenshot={path}")
+    return 0
+
+
+def cmd_cleanup(_: argparse.Namespace) -> int:
+    state = load_state()
+    serial = state.get("serial") or os.environ.get("AZKARIFY_VERIFY_SERIAL")
+    pid = state.get("pid")
+    if serial:
+        adb(serial, "emu", "kill")
+        deadline = time.time() + 20
+        while time.time() < deadline:
+            devices = run([sdk_bin("adb"), "devices"]).stdout
+            if serial not in devices:
+                break
+            time.sleep(1)
+    if pid:
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            pass
+        else:
+            # Only the process we recorded. Never kill by name.
+            os.kill(pid, 15)
+    print("cleanup complete; evidence directories were not deleted")
+    return 0
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    launch = sub.add_parser("launch", help="Start AzkarifyVerify, install debug APK, skip intro")
+    launch.add_argument("--port", type=int, default=DEFAULT_PORT)
+    launch.add_argument("--reuse", action="store_true")
+    launch.set_defaults(func=cmd_launch)
+
+    doctor = sub.add_parser("doctor", help="Read-only check that this instance is worth driving")
+    doctor.set_defaults(func=cmd_doctor)
+
+    dump = sub.add_parser("dump", help="Save the accessibility window dump")
+    dump.add_argument("--path")
+    dump.set_defaults(func=cmd_dump)
+
+    wait = sub.add_parser("wait", help="Wait for text or content-desc")
+    wait.add_argument("--text")
+    wait.add_argument("--desc")
+    wait.add_argument("--contains")
+    wait.add_argument("--timeout", type=int, default=20)
+    wait.add_argument("--absent", action="store_true")
+    wait.set_defaults(func=cmd_wait)
+
+    tap = sub.add_parser("tap", help="Tap a visible node by text or content-desc")
+    tap.add_argument("--text")
+    tap.add_argument("--desc")
+    tap.add_argument("--contains")
+    tap.add_argument("--index", type=int, default=0)
+    tap.set_defaults(func=cmd_tap)
+
+    type_cmd = sub.add_parser("type", help="Type into the focused field (spaces become %%s)")
+    type_cmd.add_argument("--text", required=True)
+    type_cmd.set_defaults(func=cmd_type)
+
+    key = sub.add_parser("key", help="Send a keyevent code")
+    key.add_argument("--code", required=True)
+    key.set_defaults(func=cmd_key)
+
+    shot = sub.add_parser("screenshot", help="Capture a PNG that survives cleanup")
+    shot.add_argument("--path", required=True)
+    shot.set_defaults(func=cmd_screenshot)
+
+    cleanup = sub.add_parser("cleanup", help="Kill the emulator this run started; keep evidence")
+    cleanup.set_defaults(func=cmd_cleanup)
+    return parser
+
+
+def main() -> int:
+    parser = build_parser()
+    args = parser.parse_args()
+    try:
+        return args.func(args)
+    except ControlError as error:
+        print(error, file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
