@@ -1,7 +1,14 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+}
+
+val uploadPropertiesFile = rootProject.file("keystore.properties")
+val uploadProperties = Properties().apply {
+    if (uploadPropertiesFile.isFile) uploadPropertiesFile.inputStream().use { load(it) }
 }
 
 android {
@@ -19,6 +26,15 @@ android {
         buildConfigField("String", "REVENUECAT_API_KEY", "\"goog_gXukEcpOrbSvmesgwvvQkHSUCQW\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    val uploadSigning =
+        if (uploadPropertiesFile.isFile) {
+            signingConfigs.create("upload") {
+                storeFile = rootProject.file(uploadProperties.getProperty("storeFile"))
+                storePassword = uploadProperties.getProperty("storePassword")
+                keyAlias = uploadProperties.getProperty("keyAlias")
+                keyPassword = uploadProperties.getProperty("keyPassword")
+            }
+        } else null
     buildFeatures { compose = true; buildConfig = true }
     bundle { language { enableSplit = false } }
     buildTypes {
@@ -29,6 +45,7 @@ android {
             buildConfigField("String", "CATALOG_BASE_URL", "\"http://127.0.0.1:8787/v1\"")
         }
         release {
+            if (uploadSigning != null) signingConfig = uploadSigning
             buildConfigField("String", "CATALOG_DEV_TOKEN", "\"\"")
             buildConfigField("String", "CATALOG_BASE_URL", "\"https://staging.api.saeed.sh/v1\"")
             isMinifyEnabled = true

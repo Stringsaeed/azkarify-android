@@ -24,4 +24,6 @@ local.properties
 *.jks
 *.keystore
 keystore.properties
+/signing/
+/release-artifacts/
 /site/.vercel/
