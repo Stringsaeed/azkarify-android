@@ -21,8 +21,16 @@ Open this directory in Android Studio, or use:
 ```
 
 Android 8.0 / API 26 or later. The release build enables R8 and resource shrinking.
-Release signing and Play testing are not yet configured. The Android
-application ID is `sh.saeed.azkarify`; the iOS bundle ID remains
+To build a signed bundle, place the upload keystore at
+`signing/azkarify-upload.jks`, copy `keystore.properties.example` to
+`keystore.properties`, and set both passwords. Keep the keystore and passwords
+in secure backups outside this repository. Both local files are ignored by Git.
+Then run `./gradlew :app:bundleRelease`. The bundle is written to
+`app/build/outputs/bundle/release/app-release.aab`. Without
+`keystore.properties`, release builds remain unsigned. Google Play uses the
+upload certificate to accept the bundle and its separate app-signing
+certificate to sign installs. The Android application ID is
+`sh.saeed.azkarify`; the iOS bundle ID remains
 `com.stringsaeed.azkarify`. Android treats the former
 `com.stringsaeed.azkarify` package as a separate installation, so its local
 favorites, progress, and settings do not move to the new package automatically.
