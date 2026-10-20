@@ -1,0 +1,101 @@
+[
+  {
+    "name": "Dubai",
+    "arabicName": "دبي",
+    "countryCode": "AE",
+    "latitude": 25.2048,
+    "longitude": 55.2708,
+    "timeZone": "Asia/Dubai",
+    "method": "DUBAI"
+  },
+  {
+    "name": "Abu Dhabi",
+    "arabicName": "أبو ظبي",
+    "countryCode": "AE",
+    "latitude": 24.4539,
+    "longitude": 54.3773,
+    "timeZone": "Asia/Dubai",
+    "method": "DUBAI"
+  },
+  {
+    "name": "Cairo",
+    "arabicName": "القاهرة",
+    "countryCode": "EG",
+    "latitude": 30.0444,
+    "longitude": 31.2357,
+    "timeZone": "Africa/Cairo",
+    "method": "EGYPTIAN"
+  },
+  {
+    "name": "Makkah",
+    "arabicName": "مكة المكرمة",
+    "countryCode": "SA",
+    "latitude": 21.4225,
+    "longitude": 39.8262,
+    "timeZone": "Asia/Riyadh",
+    "method": "UMM_AL_QURA"
+  },
+  {
+    "name": "Madinah",
+    "arabicName": "المدينة المنورة",
+    "countryCode": "SA",
+    "latitude": 24.4672,
+    "longitude": 39.6111,
+    "timeZone": "Asia/Riyadh",
+    "method": "UMM_AL_QURA"
+  },
+  {
+    "name": "Riyadh",
+    "arabicName": "الرياض",
+    "countryCode": "SA",
+    "latitude": 24.7136,
+    "longitude": 46.6753,
+    "timeZone": "Asia/Riyadh",
+    "method": "UMM_AL_QURA"
+  },
+  {
+    "name": "Doha",
+    "arabicName": "الدوحة",
+    "countryCode": "QA",
+    "latitude": 25.2854,
+    "longitude": 51.531,
+    "timeZone": "Asia/Qatar",
+    "method": "QATAR"
+  },
+  {
+    "name": "Kuwait City",
+    "arabicName": "مدينة الكويت",
+    "countryCode": "KW",
+    "latitude": 29.3759,
+    "longitude": 47.9774,
+    "timeZone": "Asia/Kuwait",
+    "method": "KUWAIT"
+  },
+  {
+    "name": "London",
+    "arabicName": "لندن",
+    "countryCode": "GB",
+    "latitude": 51.5074,
+    "longitude": -0.1278,
+    "timeZone": "Europe/London",
+    "method": "MOON_SIGHTING_COMMITTEE"
+  },
+  {
+    "name": "New York",
+    "arabicName": "نيويورك",
+    "countryCode": "US",
+    "latitude": 40.7128,
+    "longitude": -74.006,
+    "timeZone": "America/New_York",
+    "method": "MOON_SIGHTING_COMMITTEE"
+  },
+  {
+    "name": "Singapore",
+    "arabicName": "سنغافورة",
+    "countryCode": "SG",
+    "latitude": 1.3521,
+    "longitude": 103.8198,
+    "timeZone": "Asia/Singapore",
+    "method": "SINGAPORE"
+  }
+]

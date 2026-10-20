@@ -3,7 +3,12 @@
 Native Kotlin and Jetpack Compose port of `/Users/saeed/projects/azkarify`.
 One app module, an Android ViewModel, an asset repository, and small platform services.
 Typed Navigation 3 keys drive navigation, and Material Adaptive handles panes.
-The reading experience works offline. No account or content download is needed. RevenueCat handles support purchases when opened from Settings.
+The azkar reading experience works offline. No account or devotional content
+download is needed. RevenueCat handles optional support purchases.
+
+The Android privacy policy is published at
+[azkarify.saeed.sh/android/policy](https://azkarify.saeed.sh/android/policy).
+Its static source is in `site/`. Settings links to the same URL.
 
 ## Run
 
@@ -16,8 +21,11 @@ Open this directory in Android Studio, or use:
 ```
 
 Android 8.0 / API 26 or later. The release build enables R8 and resource shrinking.
-Release signing and Play Store setup have not been configured. The application ID
-is `com.stringsaeed.azkarify`, matching the existing iOS app identity.
+Release signing and Play testing are not yet configured. The Android
+application ID is `sh.saeed.azkarify`; the iOS bundle ID remains
+`com.stringsaeed.azkarify`. Android treats the former
+`com.stringsaeed.azkarify` package as a separate installation, so its local
+favorites, progress, and settings do not move to the new package automatically.
 
 ## Code
 
@@ -25,13 +33,36 @@ is `com.stringsaeed.azkarify`, matching the existing iOS app identity.
 - `data/AppViewModel.kt`: preferences and screen state, exposed through StateFlow.
 - `data/JourneyProgress.kt`: daily checklist, choices, and awards that cannot be earned twice for a step on the same day. `JourneyProgressRepository.kt` supplies atomic DataStore persistence on IO workers.
 - `ui/`: Compose screens, shared appearance, RTL layout, and lazy scrolling lists.
-- `services/`: Adhan prayer calculations and Android notification scheduling.
+- `services/`: Adhan prayer calculations, Android notification scheduling, and
+  the authenticated country and city catalog.
 
 Navigation and counter state survive activity recreation. Favorites, theme, accent,
 language and prayer configuration persist locally. Journey records use DataStore
 with automatic migration from the previous preference payload. Completed steps
 award 10 points; completing all required steps awards 25 points. Reopening a step does
 not remove or repeat its award. Optional steps do not affect journey completion.
+
+## Country and city catalog
+
+The city picker uses the 11 locations bundled from iOS when online access is
+unavailable. It can also browse the full countries API, search cities in
+English or Arabic, and load more pages. Downloaded pages are cached privately
+on the device for 24 hours and revalidated with ETags.
+
+Release builds use Play Integrity standard tokens bound to the complete request
+URL, language, and ETag. The linked Google Cloud project number is
+`97729473680`. Release currently uses the same staging API base URL as iOS.
+The backend must allow `sh.saeed.azkarify` and the Play app-signing certificate,
+and it must have service-account credentials for the linked Cloud project.
+Verify this path with a signed build installed from a Play testing track on a
+certified physical device. An emulator or sideloaded APK cannot prove the
+required Play verdicts.
+
+Debug builds use the local API's bearer token. Start the local countries API,
+run `adb reverse tcp:8787 tcp:8787`, and build with
+`AZKARIFY_CATALOG_DEV_TOKEN` set to the same token as the API's `DEV_AUTH_TOKEN`.
+The token is embedded only in the debug build. Without it, debug builds keep
+the bundled city picker and make no catalog requests.
 
 ## Material 3 Expressive and compatibility
 
@@ -67,6 +98,7 @@ its own emoji and system controls.
 ```sh
 python3 scripts/import_ios_assets.py ../azkarify
 python3 scripts/verify_ios_assets.py ../azkarify
+python3 scripts/import_ios_cities.py ../azkarify --check
 # Tooling only; needs fonttools and sharp. Outputs are already bundled.
 python3 scripts/instantiate_fonts.py
 node scripts/render_artwork.cjs
@@ -74,9 +106,8 @@ node scripts/render_artwork.cjs
 
 ## Remaining parity work
 
-- The iOS Countries API requires Apple App Attest. Its country/city picker needs an
-  Android authentication contract on the backend. Android currently supports manual
-  coordinates and device location, with an explicit IANA time zone.
+- Live full-catalog verification waits for Play app signing and backend
+  credentials. The backend setup chat is updating its former package ID.
 - RevenueCat is configured with the existing Android public SDK key. Settings opens
   its current dashboard offering and native paywall. The AED 9.99 product was observed
   on the emulator. Store purchase and restoration
