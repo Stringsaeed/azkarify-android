@@ -24,3 +24,4 @@ local.properties
 *.jks
 *.keystore
 keystore.properties
+/site/.vercel/

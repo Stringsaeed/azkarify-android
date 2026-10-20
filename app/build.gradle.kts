@@ -5,22 +5,32 @@ plugins {
 }
 
 android {
-    namespace = "com.stringsaeed.azkarify"
+    namespace = "sh.saeed.azkarify"
     compileSdk {
         version = release(37) { minorApiLevel = 2 }
     }
     defaultConfig {
-        applicationId = "com.stringsaeed.azkarify"
+        applicationId = "sh.saeed.azkarify"
         minSdk = 26
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("long", "CATALOG_CLOUD_PROJECT_NUMBER", "97729473680L")
         buildConfigField("String", "REVENUECAT_API_KEY", "\"goog_gXukEcpOrbSvmesgwvvQkHSUCQW\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true; buildConfig = true }
+    bundle { language { enableSplit = false } }
     buildTypes {
+        debug {
+            val token = providers.environmentVariable("AZKARIFY_CATALOG_DEV_TOKEN").orElse("").get()
+            val escapedToken = token.replace("\\", "\\\\").replace("\"", "\\\"")
+            buildConfigField("String", "CATALOG_DEV_TOKEN", "\"$escapedToken\"")
+            buildConfigField("String", "CATALOG_BASE_URL", "\"http://127.0.0.1:8787/v1\"")
+        }
         release {
+            buildConfigField("String", "CATALOG_DEV_TOKEN", "\"\"")
+            buildConfigField("String", "CATALOG_BASE_URL", "\"https://staging.api.saeed.sh/v1\"")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
@@ -48,6 +58,7 @@ dependencies {
     implementation(libs.kotlinx.serialization)
     implementation(libs.adhan)
     implementation(libs.revenuecat.ui)
+    implementation(libs.play.integrity)
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.json)

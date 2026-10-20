@@ -3,6 +3,7 @@
     <string name="app_lld_daea457f" formatted="false">"%lld"</string>
     <string name="app_1_lld_2_lld_1945d1f7" formatted="false">"%1$lld / %2$lld"</string>
     <string name="app_0_0000_297d62f3" formatted="false">"0.0000"</string>
+    <string name="app_1_point_for_every_33_counts_d526a922" formatted="false">"1 point for every 33 counts"</string>
     <string name="app_10_points_for_each_step_and_25_for_complet_882ef6fd" formatted="false">"10 points for each step, and 25 for completing a journey."</string>
     <string name="app_a_gentle_morning_e27bbbc5" formatted="false">"A gentle morning"</string>
     <string name="app_a_little_every_day_2ae5ce60" formatted="false">"A little, every day"</string>
@@ -32,6 +33,8 @@
     <string name="app_browse_azkar_9b4c7cbb" formatted="false">"Browse azkar"</string>
     <string name="app_calculation_method_00aa3cd0" formatted="false">"Calculation method"</string>
     <string name="app_change_city_5a7bae12" formatted="false">"Change city"</string>
+    <string name="app_choose_a_city_70db5eaa" formatted="false">"Choose a city"</string>
+    <string name="app_choose_a_country_19323e2d" formatted="false">"Choose a country"</string>
     <string name="app_choose_a_set_to_start_counting_with_one_ta_b592440d" formatted="false">"Choose a set to start counting with one tap."</string>
     <string name="app_choose_a_topic_to_read_its_azkar_4b2ff8f4" formatted="false">"Choose a topic to read its azkar"</string>
     <string name="app_choose_an_accent_color_change_language_in__efb81f93" formatted="false">"Choose an accent color. Change language in Settings."</string>
@@ -57,6 +60,7 @@
     <string name="app_dark_60acc53f" formatted="false">"Dark"</string>
     <string name="app_dhuhr_2cf8019a" formatted="false">"Dhuhr"</string>
     <string name="app_dhuhr_journey_7bb90661" formatted="false">"Dhuhr journey"</string>
+    <string name="app_done_11a6767d" formatted="false">"Done"</string>
     <string name="app_double_tap_to_change_the_count_d4e35921" formatted="false">"Double tap to change the count"</string>
     <string name="app_dua_before_the_iqama_f0a6df27" formatted="false">"Dua before the iqama"</string>
     <string name="app_dubai_uae_655ebe71" formatted="false">"Dubai, UAE"</string>
@@ -68,6 +72,7 @@
     <string name="app_enable_notifications_in_android_settings_t_6009ec2d" formatted="false">"Enable notifications in Android Settings to use reminders."</string>
     <string name="app_english_ba118bf7" formatted="false">"English"</string>
     <string name="app_enter_a_name_valid_coordinates_time_zone_a_d460d932" formatted="false">"Enter a name, valid coordinates, time zone, and adjustment to save."</string>
+    <string name="app_enter_at_least_two_characters_to_search_ci_f3300898" formatted="false">"Enter at least two characters to search cities."</string>
     <string name="app_evening_azkar_4793192d" formatted="false">"Evening azkar"</string>
     <string name="app_explore_journeys_90f422ec" formatted="false">"Explore journeys"</string>
     <string name="app_fajr_a239b920" formatted="false">"Fajr"</string>
@@ -99,6 +104,7 @@
     <string name="app_leave_the_mosque_b226b101" formatted="false">"Leave the mosque"</string>
     <string name="app_leaving_home_azkar_b10e4172" formatted="false">"Leaving home azkar"</string>
     <string name="app_light_dbcd5e7b" formatted="false">"Light"</string>
+    <string name="app_load_more_cities_560f32f3" formatted="false">"Load more cities"</string>
     <string name="app_loading_azkar_e8ccb209" formatted="false">"Loading azkar"</string>
     <string name="app_location_15b61974" formatted="false">"Location"</string>
     <string name="app_location_name_eab349b2" formatted="false">"Location name"</string>
@@ -135,11 +141,14 @@
     <string name="app_optional_59be7133" formatted="false">"Optional"</string>
     <string name="app_page_lld_of_lld_fa8514ac" formatted="false">"Page %lld of %lld"</string>
     <string name="app_paywall_unavailable_3e5af59c" formatted="false">"Paywall unavailable"</string>
+    <string name="app_popular_cities_are_available_offline_enter_9a3c493a" formatted="false">"Popular cities are available offline. Enter coordinates for another place."</string>
     <string name="app_pray_subh_or_duha_30ebb346" formatted="false">"Pray Subh or Duha"</string>
     <string name="app_pray_with_remembrance_56748d7c" formatted="false">"Pray with remembrance"</string>
     <string name="app_prayer_times_1bd9b259" formatted="false">"Prayer times"</string>
     <string name="app_prayer_times_wherever_you_are_d13dff05" formatted="false">"Prayer times, wherever you are"</string>
     <string name="app_prepare_pray_and_remember_bb06b5d6" formatted="false">"Prepare, pray, and remember"</string>
+    <string name="app_previous_a57b08a4" formatted="false">"Previous"</string>
+    <string name="app_privacy_policy_ba445cff" formatted="false">"Privacy policy"</string>
     <string name="app_progress_unavailable_563b460c" formatted="false">"Progress unavailable"</string>
     <string name="app_qatar_55ccc501" formatted="false">"Qatar"</string>
     <string name="app_quick_mode_6cd472b8" formatted="false">"Quick Mode"</string>
@@ -156,6 +165,7 @@
     <string name="app_saved_b5c120b3" formatted="false">"Saved"</string>
     <string name="app_search_azkar_b48bc61e" formatted="false">"Search azkar"</string>
     <string name="app_search_cities_86800df7" formatted="false">"Search cities"</string>
+    <string name="app_search_countries_320113ee" formatted="false">"Search countries"</string>
     <string name="app_search_time_zones_86257451" formatted="false">"Search time zones"</string>
     <string name="app_set_location_c62f7fb1" formatted="false">"Set location"</string>
     <string name="app_set_prayer_times_b374bf79" formatted="false">"Set prayer times"</string>
