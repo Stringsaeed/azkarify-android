@@ -1,118 +1,164 @@
 package sh.saeed.azkarify.ui
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import sh.saeed.azkarify.data.*
 import kotlinx.coroutines.launch
+import sh.saeed.azkarify.data.AppState
+import sh.saeed.azkarify.ui.components.AzButton
+import sh.saeed.azkarify.ui.components.AzButtonVariant
+import sh.saeed.azkarify.ui.components.AzEyebrow
+import sh.saeed.azkarify.ui.components.AzIcon
+import sh.saeed.azkarify.ui.components.AzJourneyArch
+import sh.saeed.azkarify.ui.components.AzOrnament
+import sh.saeed.azkarify.ui.components.AzOrnamentShape
+import sh.saeed.azkarify.ui.components.AzPageDots
+import sh.saeed.azkarify.ui.components.AzSticker
+import sh.saeed.azkarify.ui.components.AzSymbol
+import sh.saeed.azkarify.ui.theme.Az
+import sh.saeed.azkarify.ui.theme.AzSpace
 
+private class IntroPage(val eyebrow: String, val title: String, val body: String, val art: Int)
+
+/** First launch: three pages over a mist disc, then Today. */
 @Composable
 fun IntroScreen(state: AppState, finish: () -> Unit) {
+    val colors = Az.colors
     val pages =
         listOf(
-            Triple("📖", "Browse azkar", "Find a zikr by topic or search for it."),
-            Triple(
-                "📖",
-                "Read and reflect",
-                "Open a topic to read its azkar or use the slideshow.",
+            IntroPage(
+                state.text("Welcome to Azkarify"),
+                state.text("Small moments.\nDeeper connection."),
+                state.text("Daily azkar, gently paced through your day."),
+                0,
             ),
-            Triple("⭐", "Save favorites", "Keep the topics you return to close at hand."),
-            Triple("⚡", "Quick Mode", "Start with morning, evening, sleep, or waking azkar."),
-            Triple("📿", "Use the counter", "Tap to count, or count down repeated azkar."),
-            Triple("🔔", "Set reminders", "Choose morning and evening times in Settings."),
-            Triple(
-                "🎨",
-                "Make it yours",
-                "Choose an accent color. Change language in iOS Settings.",
+            IntroPage(
+                state.text("Journeys"),
+                state.text("A path through\nyour day."),
+                state.text("Morning, prayers and evening, one step at a time. Progress starts fresh each day."),
+                1,
             ),
-            Triple("💛", "Support the app", "Find ways to support future updates in Settings."),
+            IntroPage(
+                state.text("Read and count"),
+                state.text("Read, count,\nreturn."),
+                state.text("Tap to count each zikr. Reminders and your progress stay on this device."),
+                2,
+            ),
         )
     val pager = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
-    val p = LocalPalette.current
-    Column(
-        Modifier.fillMaxSize().safeDrawingPadding(),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-    ) {
-        TextButton(
-            onClick = finish,
-            modifier = Modifier.align(Alignment.End).padding(horizontal = 24.dp),
-        ) {
-            Text(state.text("Skip"))
-        }
-        HorizontalPager(pager, Modifier.weight(1f)) { index ->
+    val last = pager.currentPage == pages.lastIndex
+    Column(Modifier.fillMaxSize().background(colors.paper).safeDrawingPadding()) {
+        AzButton(
+            state.text("Skip"),
+            finish,
+            Modifier.align(Alignment.End).padding(horizontal = AzSpace.xs),
+            AzButtonVariant.Text,
+        )
+        HorizontalPager(pager, Modifier.weight(1f), beyondViewportPageCount = 0) { index ->
             val page = pages[index]
             Column(
-                Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(24.dp),
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = AzSpace.gutter),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(28.dp),
             ) {
-                Box(
-                    Modifier.size(160.dp)
-                        .background(p.secondary.copy(alpha = .06f), CircleShape)
-                        .border(1.5.dp, p.accent.copy(alpha = .35f), CircleShape),
-                    contentAlignment = Alignment.Center,
+                Spacer(Modifier.size(AzSpace.md))
+                IntroArt(page.art, state, current = index == pager.currentPage)
+                Spacer(Modifier.size(AzSpace.xl))
+                Column(
+                    Modifier.widthIn(max = 480.dp).fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(AzSpace.sm),
                 ) {
-                    Text(page.first, fontSize = 60.sp)
+                    AzEyebrow(page.eyebrow)
+                    Text(page.title, Modifier.semantics { heading() }, style = Az.type.display, color = colors.ink)
+                    Text(page.body, style = Az.type.body, color = colors.inkSoft)
                 }
-                Text(
-                    state.text(page.second),
-                    fontSize = 34.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 42.sp,
-                )
-                Text(
-                    if (index == 6)
-                        state.text("Choose an accent color. Change language in Settings.")
-                    else state.text(page.third),
-                    fontSize = 20.sp,
-                    color = p.secondary,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 28.sp,
-                )
             }
         }
         Row(
-            Modifier.align(Alignment.CenterHorizontally),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = AzSpace.gutter)
+                .padding(top = AzSpace.md, bottom = AzSpace.lg),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            repeat(pages.size) { i ->
-                Box(
-                    Modifier.size(if (i == pager.currentPage) 8.dp else 6.dp)
-                        .background(
-                            if (i == pager.currentPage) p.accent else p.secondary.copy(alpha = .3f),
-                            CircleShape,
-                        )
+            AzPageDots(pages.size, pager.currentPage, Modifier.weight(1f).clearAndSetSemantics {})
+            AzButton(
+                state.text(if (last) "Get started" else "Next"),
+                {
+                    if (last) finish()
+                    else scope.launch { pager.animateScrollToPage(pager.currentPage + 1) }
+                },
+                trailing = if (last) null else AzSymbol.forward,
+            )
+        }
+    }
+}
+
+/** Hero art: a mist disc with two orbits, and the page's motif in the middle. */
+@Composable
+private fun IntroArt(art: Int, state: AppState, current: Boolean) {
+    val colors = Az.colors
+    Box(Modifier.size(280.dp).clearAndSetSemantics {}, contentAlignment = Alignment.Center) {
+        Canvas(Modifier.fillMaxSize()) {
+            drawCircle(colors.mist, radius = size.minDimension * 0.42f)
+            val stroke = Stroke(1.dp.toPx())
+            drawCircle(colors.orbit, radius = size.minDimension * 0.47f, style = stroke)
+            drawCircle(colors.orbit.copy(alpha = 0.5f), radius = size.minDimension * 0.33f, style = stroke)
+        }
+        when (art) {
+            0 -> {
+                AzJourneyArch(width = 132.dp, height = 176.dp) {
+                    Text("ذكر", style = Az.type.readingArabic.copy(fontSize = Az.type.display.fontSize), color = colors.ink)
+                }
+                AzSticker(
+                    state.text("Less scrolling. More soul."),
+                    Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp),
+                    large = true,
                 )
             }
-        }
-        Button(
-            shapes = ButtonDefaults.shapes(),
-            onClick = {
-                if (pager.currentPage == pages.lastIndex) finish()
-                else scope.launch { pager.animateScrollToPage(pager.currentPage + 1) }
-            },
-            modifier =
-                Modifier.padding(horizontal = 24.dp)
-                    .padding(bottom = 24.dp)
-                    .fillMaxWidth()
-                    .heightIn(min = 52.dp),
-        ) {
-            Text(
-                state.text(if (pager.currentPage == pages.lastIndex) "Get started" else "Next"),
-                fontSize = 17.sp,
-            )
+            1 -> {
+                Box(Modifier.size(112.dp).background(colors.sage, CircleShape), contentAlignment = Alignment.Center) {
+                    AzIcon(AzSymbol.sunrise, null, size = 48.dp, tint = colors.ink)
+                }
+                AzOrnament(AzOrnamentShape.Sun, colors.spark, Modifier.align(Alignment.TopEnd).padding(36.dp), 32.dp)
+                AzOrnament(AzOrnamentShape.Crescent, colors.forest, Modifier.align(Alignment.BottomStart).padding(40.dp), 28.dp)
+            }
+            else -> {
+                Box(Modifier.size(132.dp).background(colors.peach, CircleShape), contentAlignment = Alignment.Center) {
+                    Text(state.number(33), style = Az.type.numeral, color = colors.ink)
+                }
+                AzOrnament(AzOrnamentShape.Star, colors.spark, Modifier.align(Alignment.TopStart).padding(40.dp), 36.dp, spin = current)
+                AzOrnament(AzOrnamentShape.Sparkle, colors.forest, Modifier.align(Alignment.BottomEnd).padding(44.dp), 24.dp)
+            }
         }
     }
 }

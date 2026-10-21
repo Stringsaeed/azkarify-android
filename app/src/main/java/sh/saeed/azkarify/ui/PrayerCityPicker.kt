@@ -4,9 +4,8 @@ package sh.saeed.azkarify.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -14,9 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import java.util.Locale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -26,6 +23,17 @@ import sh.saeed.azkarify.services.CatalogCountry
 import sh.saeed.azkarify.services.CatalogDatasetChanged
 import sh.saeed.azkarify.services.CountryCatalogClient
 import sh.saeed.azkarify.services.PrayerCityOption
+import sh.saeed.azkarify.ui.components.AzButton
+import sh.saeed.azkarify.ui.components.AzButtonVariant
+import sh.saeed.azkarify.ui.components.AzChevron
+import sh.saeed.azkarify.ui.components.AzIcon
+import sh.saeed.azkarify.ui.components.AzIconButton
+import sh.saeed.azkarify.ui.components.AzIconButtonVariant
+import sh.saeed.azkarify.ui.components.AzListRow
+import sh.saeed.azkarify.ui.components.AzSymbol
+import sh.saeed.azkarify.ui.components.azGroupItem
+import sh.saeed.azkarify.ui.theme.Az
+import sh.saeed.azkarify.ui.theme.AzSpace
 
 @Composable
 internal fun PrayerCityPicker(
@@ -61,7 +69,7 @@ internal fun PrayerCityPicker(
     var cityRetry by remember { mutableIntStateOf(0) }
     var nextCursor by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
-    val palette = LocalPalette.current
+    val colors = Az.colors
 
     LaunchedEffect(client, state.language, countryRetry) {
         if (client == null) return@LaunchedEffect
@@ -117,89 +125,82 @@ internal fun PrayerCityPicker(
             initialValue = SheetValue.Hidden,
             enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded),
         ),
-        containerColor = palette.background,
+        containerColor = colors.paper,
     ) {
         Column(
-            Modifier.fillMaxWidth().fillMaxHeight(.9f).padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxWidth().fillMaxHeight(.9f).padding(horizontal = AzSpace.gutter),
+            verticalArrangement = Arrangement.spacedBy(AzSpace.sm),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (countryCode != null)
-                    TextButton(onClick = { countryCode = null }) { Text(state.text("Back")) }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AzSpace.xs)) {
+                if (countryCode != null) AzIconButton(AzSymbol.back, state.text("Back"), { countryCode = null })
                 Text(
                     state.text(if (countryCode == null) "Choose a country" else "Choose a city"),
                     modifier = Modifier.weight(1f),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = Az.type.title2,
+                    color = colors.ink,
                 )
-                IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, state.text("Close")) }
+                AzIconButton(AzSymbol.close, state.text("Close"), onDismiss, variant = AzIconButtonVariant.Filled)
             }
             if (countriesFailed || citiesFailed || client == null) {
                 Text(
                     state.text("Popular cities are available offline. Enter coordinates for another place."),
-                    color = palette.secondary,
+                    style = Az.type.footnote,
+                    color = colors.inkMuted,
                 )
             }
             if (countryCode == null) {
-                OutlinedTextField(
-                    countrySearch,
-                    { countrySearch = it },
-                    label = { Text(state.text("Search countries")) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                )
-                if (countriesLoading) LinearProgressIndicator(Modifier.fillMaxWidth())
-                LazyColumn(Modifier.weight(1f)) {
-                    items(
+                SearchField(countrySearch, { countrySearch = it }, state.text("Search countries"))
+                if (countriesLoading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = colors.accent, trackColor = colors.paperSunk)
+                val visible =
+                    remember(countries, countrySearch) {
+                        val query = countrySearch.trim()
                         countries.filter { country ->
-                            val query = countrySearch.trim()
                             query.isEmpty() || country.code.contains(query, ignoreCase = true) ||
                                 country.englishName.contains(query, ignoreCase = true) ||
                                 country.arabicName.contains(query, ignoreCase = true)
-                        },
-                        key = CatalogCountry::code,
-                    ) { country ->
-                        ListItem(
+                        }
+                    }
+                LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = AzSpace.xl)) {
+                    itemsIndexed(visible, key = { _, it -> it.code }, contentType = { _, _ -> "country" }) { index, country ->
+                        // Flags are emoji, which the design system leaves out.
+                        AzListRow(
+                            country.displayName(state.language),
+                            Modifier.azGroupItem(index, visible.size, colors).testTag("country.${country.code}"),
                             onClick = {
                                 countryCode = country.code
                                 citySearch = ""
                             },
-                            modifier = Modifier.testTag("country.${country.code}"),
-                            supportingContent = { Text(country.code) },
-                        ) {
-                            Text("${country.flag} ${country.displayName(state.language)}".trim())
-                        }
+                            subtitle = country.code,
+                            divider = index > 0,
+                            inset = AzSpace.md,
+                            trailing = { AzChevron() },
+                        )
                     }
                 }
                 if (countriesFailed)
-                    TextButton(onClick = { countryRetry++ }) { Text(state.text("Retry")) }
+                    AzButton(state.text("Retry"), { countryRetry++ }, variant = AzButtonVariant.Text)
             } else {
-                OutlinedTextField(
-                    citySearch,
-                    { citySearch = it },
-                    label = { Text(state.text("Search cities")) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                )
+                SearchField(citySearch, { citySearch = it }, state.text("Search cities"))
                 if (citySearch.trim().length == 1 && client != null)
-                    Text(state.text("Enter at least two characters to search cities."))
-                if (citiesLoading) LinearProgressIndicator(Modifier.fillMaxWidth())
-                LazyColumn(Modifier.weight(1f)) {
-                    items(cities, key = { it.id }) { city ->
-                        ListItem(
+                    Text(state.text("Enter at least two characters to search cities."), style = Az.type.footnote, color = colors.inkMuted)
+                if (citiesLoading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = colors.accent, trackColor = colors.paperSunk)
+                LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = AzSpace.xl)) {
+                    itemsIndexed(cities, key = { _, it -> it.id }, contentType = { _, _ -> "city" }) { index, city ->
+                        AzListRow(
+                            city.displayName(state.language),
+                            Modifier.azGroupItem(index, cities.size, colors).testTag("city.${city.countryCode}.${city.name}"),
                             onClick = { onSelect(city) },
-                            modifier = Modifier.testTag("city.${city.countryCode}.${city.name}"),
-                            supportingContent = { Text(city.countryCode) },
-                        ) {
-                            Text(city.displayName(state.language))
-                        }
+                            divider = index > 0,
+                            inset = AzSpace.md,
+                        )
                     }
                     if (nextCursor != null && client != null) {
                         item {
-                            TextButton(
-                                onClick = {
-                                    val selected = countryCode ?: return@TextButton
-                                    val cursor = nextCursor ?: return@TextButton
+                            AzButton(
+                                state.text("Load more cities"),
+                                {
+                                    val selected = countryCode ?: return@AzButton
+                                    val cursor = nextCursor ?: return@AzButton
                                     val query = citySearch.trim()
                                     scope.launch {
                                         citiesLoading = true
@@ -230,16 +231,41 @@ internal fun PrayerCityPicker(
                                         }
                                     }
                                 },
+                                Modifier.padding(top = AzSpace.sm),
+                                AzButtonVariant.Text,
                                 enabled = !citiesLoading,
-                            ) {
-                                Text(state.text("Load more cities"))
-                            }
+                            )
                         }
                     }
                 }
                 if (citiesFailed)
-                    TextButton(onClick = { cityRetry++ }) { Text(state.text("Retry")) }
+                    AzButton(state.text("Retry"), { cityRetry++ }, variant = AzButtonVariant.Text)
             }
         }
     }
+}
+
+@Composable
+private fun SearchField(value: String, onChange: (String) -> Unit, label: String) {
+    val colors = Az.colors
+    TextField(
+        value,
+        onChange,
+        Modifier.fillMaxWidth(),
+        placeholder = { Text(label, style = Az.type.body, color = colors.inkMuted) },
+        leadingIcon = { AzIcon(AzSymbol.search, null, tint = colors.inkMuted) },
+        singleLine = true,
+        textStyle = Az.type.body,
+        shape = CircleShape,
+        colors =
+            TextFieldDefaults.colors(
+                focusedContainerColor = colors.paperSunk,
+                unfocusedContainerColor = colors.paperSunk,
+                focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+                unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+                focusedTextColor = colors.ink,
+                unfocusedTextColor = colors.ink,
+                cursorColor = colors.accent,
+            ),
+    )
 }

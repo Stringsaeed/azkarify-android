@@ -37,6 +37,8 @@ data class AppState(
     val progressReady: Boolean = false,
     val progressFailure: ProgressFailure? = null,
     val prayerConfiguration: PrayerConfiguration? = null,
+    val readerScale: Float = 1f,
+    val transliteration: Boolean = false,
 ) {
     fun text(key: String) = copy[key] ?: key
 }
@@ -67,6 +69,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 favorites = (savedPreferences["favorites"] as? Set<*>).orEmpty()
                     .filterIsInstance<String>().mapNotNull(String::toIntOrNull).toSet(),
                 prayerConfiguration = PrayerConfiguration.decode(savedPreferences["prayerConfiguration"] as? String),
+                readerScale = (savedPreferences["readerScale"] as? Float)?.takeIf { it in 0.85f..1.5f } ?: 1f,
+                transliteration = savedPreferences["transliteration"] as? Boolean ?: false,
             ))
     val state = mutableState.asStateFlow()
 
@@ -149,6 +153,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
         load()
+    }
+
+    fun setReaderScale(value: Float) {
+        preferences.edit { putFloat("readerScale", value) }
+        mutableState.update { it.copy(readerScale = value) }
+    }
+
+    fun setTransliteration(value: Boolean) {
+        preferences.edit { putBoolean("transliteration", value) }
+        mutableState.update { it.copy(transliteration = value) }
     }
 
     fun finishIntro() {

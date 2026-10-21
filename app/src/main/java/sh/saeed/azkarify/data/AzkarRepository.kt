@@ -7,7 +7,13 @@ import org.json.JSONObject
 
 data class Category(val id: Int, val title: String, val path: String)
 
-data class Entry(val id: Int, val repetitions: Int, val arabic: String, val translated: String) {
+data class Entry(
+    val id: Int,
+    val repetitions: Int,
+    val arabic: String,
+    val translated: String,
+    val transliteration: String = "",
+) {
     fun text(language: String) = if (language == "ar") arabic else translated
 }
 
@@ -52,6 +58,7 @@ class AzkarRepository(private val assets: AssetManager) {
                     it.getInt("repeat"),
                     text.getString("arabic"),
                     text.getString("translated"),
+                    text.optString("arabicTranslated"),
                 )
             }
         }
@@ -137,37 +144,3 @@ fun prayerJourneys(copy: Map<String, String>): List<Journey> {
             )
         }
 }
-
-fun emoji(id: Int) =
-    when (id) {
-        1 -> "☀️"
-        in 2..5 -> "👕"
-        6,
-        7 -> "🚻"
-        8,
-        9 -> "💧"
-        10,
-        11 -> "🏠"
-        in 12..14 -> "🕌"
-        15 -> "📣"
-        27 -> "🌅"
-        in 28..31,
-        67 -> "🌙"
-        in 34..46 -> "💭"
-        47,
-        48 -> "👶"
-        in 49..51 -> "🏥"
-        in 52..60 -> "🕊️"
-        61 -> "🌬️"
-        62 -> "🌩️"
-        in 63..66 -> "🌧️"
-        68 -> "🌇"
-        in 69..76 -> "🍽️"
-        77,
-        78 -> "🤧"
-        79,
-        80 -> "💍"
-        in 95..105 -> "🧳"
-        in 115..125 -> "🕋"
-        else -> "🤲"
-    }

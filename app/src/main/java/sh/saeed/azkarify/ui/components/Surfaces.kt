@@ -454,13 +454,13 @@ fun AzSticker(
 
 /** The day's points in the toolbar; opens the points sheet. */
 @Composable
-fun AzPointsBadge(points: String, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun AzPointsBadge(points: String, label: String, onClick: (() -> Unit)?, modifier: Modifier = Modifier) {
     val colors = Az.colors
     Row(
         modifier
             .heightIn(min = 48.dp)
             .clip(CircleShape)
-            .clickable(role = Role.Button, onClick = onClick)
+            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
             .semantics(mergeDescendants = true) { contentDescription = "$label, $points" }
             .padding(vertical = 6.dp, horizontal = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -589,7 +589,7 @@ fun AzSwatchRow(
 
 /** Native switch tinted `forest`: a switch shows a state, not the accent. */
 @Composable
-fun AzSwitch(checked: Boolean, onCheckedChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+fun AzSwitch(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?, modifier: Modifier = Modifier) {
     val colors = Az.colors
     Switch(
         checked,

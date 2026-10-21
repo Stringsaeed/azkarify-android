@@ -1,24 +1,40 @@
 <resources>
     <string name="app_name">Azkarify</string>
+    <string name="app_1_s_of_2_s_steps_completed_1ee93568" formatted="false">"%1$s of %2$s steps completed"</string>
     <string name="app_lld_daea457f" formatted="false">"%lld"</string>
     <string name="app_1_lld_2_lld_1945d1f7" formatted="false">"%1$lld / %2$lld"</string>
+    <string name="app_s_points_in_total_358bfc93" formatted="false">"%s points in total"</string>
+    <string name="app_s_steps_7e278bfe" formatted="false">"%s steps"</string>
+    <string name="app_s_to_your_next_point_6cd46c65" formatted="false">"%s to your next point"</string>
     <string name="app_0_0000_297d62f3" formatted="false">"0.0000"</string>
+    <string name="app_01_morning_923ffa0a" formatted="false">"01 / Morning"</string>
+    <string name="app_02_through_the_day_cc36e497" formatted="false">"02 / Through the day"</string>
+    <string name="app_03_evening_2c2b7347" formatted="false">"03 / Evening"</string>
     <string name="app_1_point_for_every_33_counts_d526a922" formatted="false">"1 point for every 33 counts"</string>
     <string name="app_10_points_for_each_step_and_25_for_complet_882ef6fd" formatted="false">"10 points for each step, and 25 for completing a journey."</string>
     <string name="app_a_gentle_morning_e27bbbc5" formatted="false">"A gentle morning"</string>
+    <string name="app_a_little_every_day_43f65c43" formatted="false">"A little,\nevery day."</string>
     <string name="app_a_little_every_day_2ae5ce60" formatted="false">"A little, every day"</string>
     <string name="app_a_moment_of_remembrance_before_your_day_ou_d6e82e1c" formatted="false">"A moment of remembrance before your day outside"</string>
+    <string name="app_a_path_through_your_day_fde8c699" formatted="false">"A path through\nyour day."</string>
+    <string name="app_about_4efca0d1" formatted="false">"About"</string>
+    <string name="app_accent_a5c6fb18" formatted="false">"Accent"</string>
     <string name="app_accent_color_baeefbad" formatted="false">"Accent color"</string>
+    <string name="app_add_one_156e294d" formatted="false">"Add one"</string>
     <string name="app_add_to_favorites_7f3c0782" formatted="false">"Add to favorites"</string>
     <string name="app_after_a_troubling_dream_b1527967" formatted="false">"After a troubling dream"</string>
     <string name="app_after_prayer_azkar_2286e7f0" formatted="false">"After prayer azkar"</string>
+    <string name="app_all_a52ace42" formatted="false">"All"</string>
     <string name="app_all_azkar_7a5e71d4" formatted="false">"All azkar"</string>
+    <string name="app_all_steps_done_for_today_3a19fc90" formatted="false">"All steps, done for today."</string>
     <string name="app_an_evening_pause_958196ef" formatted="false">"An evening pause"</string>
+    <string name="app_appearance_3907fa7f" formatted="false">"Appearance"</string>
     <string name="app_label_bafb66f3" formatted="false">"العربية"</string>
     <string name="app_as_the_day_settles_60024c40" formatted="false">"As the day settles"</string>
     <string name="app_asr_bd7aa938" formatted="false">"Asr"</string>
     <string name="app_asr_calculation_e6ddae45" formatted="false">"Asr calculation"</string>
     <string name="app_asr_journey_06b553c6" formatted="false">"Asr journey"</string>
+    <string name="app_azkar_e35f6557" formatted="false">"Azkar"</string>
     <string name="app_azkar_for_the_adhan_b5acd486" formatted="false">"Azkar for the adhan"</string>
     <string name="app_azkar_reminders_4af7dc18" formatted="false">"Azkar reminders"</string>
     <string name="app_azkar_when_setting_out_270767b5" formatted="false">"Azkar when setting out"</string>
@@ -31,6 +47,7 @@
     <string name="app_blue_ec7d56a0" formatted="false">"Blue"</string>
     <string name="app_brown_18f28559" formatted="false">"Brown"</string>
     <string name="app_browse_azkar_9b4c7cbb" formatted="false">"Browse azkar"</string>
+    <string name="app_calculation_025194fb" formatted="false">"Calculation"</string>
     <string name="app_calculation_method_00aa3cd0" formatted="false">"Calculation method"</string>
     <string name="app_change_city_5a7bae12" formatted="false">"Change city"</string>
     <string name="app_choose_a_city_70db5eaa" formatted="false">"Choose a city"</string>
@@ -41,6 +58,8 @@
     <string name="app_choose_an_accent_color_change_language_in__adb40566" formatted="false">"Choose an accent color. Change language in iOS Settings."</string>
     <string name="app_choose_morning_and_evening_times_in_settin_c3b8a227" formatted="false">"Choose morning and evening times in Settings."</string>
     <string name="app_choose_the_prayer_for_this_routine_3c6aa064" formatted="false">"Choose the prayer for this routine."</string>
+    <string name="app_city_fc33f732" formatted="false">"City"</string>
+    <string name="app_city_coordinates_represent_the_city_centre_e27a82f9" formatted="false">"City coordinates represent the city centre. You can change the calculation method in Settings › Prayer times."</string>
     <string name="app_clear_location_c10be6b3" formatted="false">"Clear location"</string>
     <string name="app_clear_search_3b7ea517" formatted="false">"Clear search"</string>
     <string name="app_close_7d9eb7ac" formatted="false">"Close"</string>
@@ -56,8 +75,10 @@
     <string name="app_count_lld_c9e7e5e6" formatted="false">"Count: %lld"</string>
     <string name="app_counter_a78cfdf4" formatted="false">"Counter"</string>
     <string name="app_current_location_cf8c8078" formatted="false">"Current location"</string>
+    <string name="app_daily_azkar_gently_paced_through_your_day_535fa23e" formatted="false">"Daily azkar, gently paced through your day."</string>
     <string name="app_daily_journeys_03cc0651" formatted="false">"Daily journeys"</string>
     <string name="app_dark_60acc53f" formatted="false">"Dark"</string>
+    <string name="app_day_8f2364e1" formatted="false">"Day"</string>
     <string name="app_dhuhr_2cf8019a" formatted="false">"Dhuhr"</string>
     <string name="app_dhuhr_journey_7bb90661" formatted="false">"Dhuhr journey"</string>
     <string name="app_done_11a6767d" formatted="false">"Done"</string>
@@ -65,8 +86,10 @@
     <string name="app_dua_before_the_iqama_f0a6df27" formatted="false">"Dua before the iqama"</string>
     <string name="app_dubai_uae_655ebe71" formatted="false">"Dubai, UAE"</string>
     <string name="app_duha_cdd19cdb" formatted="false">"Duha"</string>
+    <string name="app_dusk_abd7160c" formatted="false">"Dusk"</string>
     <string name="app_earned_today_74183778" formatted="false">"Earned today: "</string>
     <string name="app_egyptian_general_authority_of_survey_218abbbe" formatted="false">"Egyptian General Authority of Survey"</string>
+    <string name="app_ember_cb1655db" formatted="false">"Ember"</string>
     <string name="app_enable_location_services_and_try_again_a9b11088" formatted="false">"Enable location services and try again."</string>
     <string name="app_enable_notifications_for_azkarify_in_ios_s_b08595c5" formatted="false">"Enable notifications for Azkarify in iOS Settings."</string>
     <string name="app_enable_notifications_in_android_settings_t_6009ec2d" formatted="false">"Enable notifications in Android Settings to use reminders."</string>
@@ -78,11 +101,14 @@
     <string name="app_fajr_a239b920" formatted="false">"Fajr"</string>
     <string name="app_fajr_journey_7c8009ed" formatted="false">"Fajr journey"</string>
     <string name="app_favorites_7a1f2a83" formatted="false">"Favorites"</string>
+    <string name="app_favourites_d97d51d3" formatted="false">"Favourites"</string>
     <string name="app_find_a_zikr_by_topic_or_search_for_it_f7c910ea" formatted="false">"Find a zikr by topic or search for it."</string>
     <string name="app_find_the_right_zikr_faster_c1efad7b" formatted="false">"Find the right zikr faster"</string>
     <string name="app_find_ways_to_support_future_updates_in_set_3e82b8a9" formatted="false">"Find ways to support future updates in Settings."</string>
     <string name="app_finding_your_location_992f1d90" formatted="false">"Finding your location…"</string>
+    <string name="app_focus_mode_047cfdeb" formatted="false">"Focus mode"</string>
     <string name="app_follow_a_journey_at_your_own_pace_c804627d" formatted="false">"Follow a journey at your own pace."</string>
+    <string name="app_forest_eed88b3a" formatted="false">"Forest"</string>
     <string name="app_get_started_61e8d44a" formatted="false">"Get started"</string>
     <string name="app_go_to_the_mosque_d148a920" formatted="false">"Go to the mosque"</string>
     <string name="app_green_d486dfbd" formatted="false">"Green"</string>
@@ -92,6 +118,7 @@
     <string name="app_if_needed_before_wudu_eb923d79" formatted="false">"If needed before wudu."</string>
     <string name="app_if_you_are_riding_in_a_vehicle_96b53c16" formatted="false">"If you are riding in a vehicle."</string>
     <string name="app_if_you_wake_during_the_night_44b0503e" formatted="false">"If you wake during the night"</string>
+    <string name="app_incomplete_75f33cdf" formatted="false">"Incomplete"</string>
     <string name="app_isha_d48047e6" formatted="false">"Isha"</string>
     <string name="app_isha_adjustment_minutes_d3068fff" formatted="false">"Isha adjustment (minutes)"</string>
     <string name="app_isha_journey_d815bb63" formatted="false">"Isha journey"</string>
@@ -100,9 +127,11 @@
     <string name="app_keep_the_topics_you_return_to_close_at_han_835df40a" formatted="false">"Keep the topics you return to close at hand."</string>
     <string name="app_kuwait_10c3c2e2" formatted="false">"Kuwait"</string>
     <string name="app_language_a4fe6526" formatted="false">"Language"</string>
+    <string name="app_larger_text_13b39463" formatted="false">"Larger text"</string>
     <string name="app_latitude_238a676d" formatted="false">"Latitude"</string>
     <string name="app_leave_the_mosque_b226b101" formatted="false">"Leave the mosque"</string>
     <string name="app_leaving_home_azkar_b10e4172" formatted="false">"Leaving home azkar"</string>
+    <string name="app_less_scrolling_more_soul_a932ad60" formatted="false">"Less scrolling. More soul."</string>
     <string name="app_light_dbcd5e7b" formatted="false">"Light"</string>
     <string name="app_load_more_cities_560f32f3" formatted="false">"Load more cities"</string>
     <string name="app_loading_azkar_e8ccb209" formatted="false">"Loading azkar"</string>
@@ -123,16 +152,20 @@
     <string name="app_moonsighting_committee_d6286a70" formatted="false">"Moonsighting Committee"</string>
     <string name="app_morning_evening_e07136c2" formatted="false">"Morning &amp; Evening"</string>
     <string name="app_morning_azkar_4a26f836" formatted="false">"Morning azkar"</string>
+    <string name="app_morning_prayers_and_evening_one_step_at_a__5ca7a015" formatted="false">"Morning, prayers and evening, one step at a time. Progress starts fresh each day."</string>
     <string name="app_muslim_world_league_1751d49a" formatted="false">"Muslim World League"</string>
     <string name="app_next_1ff57a29" formatted="false">"Next"</string>
     <string name="app_next_prayer_e7f498e8" formatted="false">"Next prayer"</string>
+    <string name="app_night_4e9f8db8" formatted="false">"Night"</string>
     <string name="app_no_azkar_found_802064ee" formatted="false">"No azkar found"</string>
     <string name="app_no_favorites_yet_95c91385" formatted="false">"No favorites yet"</string>
+    <string name="app_no_favourites_yet_5d382926" formatted="false">"No favourites yet"</string>
     <string name="app_no_recent_location_enter_coordinates_or_tr_358648e0" formatted="false">"No recent location. Enter coordinates or try again after opening Maps."</string>
     <string name="app_no_results_a43619f3" formatted="false">"No results"</string>
     <string name="app_no_support_offering_is_available_yet_ce89700b" formatted="false">"No support offering is available yet."</string>
     <string name="app_north_america_isna_36553c88" formatted="false">"North America, ISNA"</string>
     <string name="app_not_now_a0e63d7c" formatted="false">"Not now"</string>
+    <string name="app_not_set_4895f731" formatted="false">"Not set"</string>
     <string name="app_notifications_are_disabled_b93ab3a6" formatted="false">"Notifications are disabled"</string>
     <string name="app_notifications_are_disabled_enable_them_in__c3a5df80" formatted="false">"Notifications are disabled. Enable them in iOS Settings to use reminders."</string>
     <string name="app_ok_565339bc" formatted="false">"OK"</string>
@@ -141,10 +174,14 @@
     <string name="app_optional_59be7133" formatted="false">"Optional"</string>
     <string name="app_page_lld_of_lld_fa8514ac" formatted="false">"Page %lld of %lld"</string>
     <string name="app_paywall_unavailable_3e5af59c" formatted="false">"Paywall unavailable"</string>
+    <string name="app_please_try_again_eea4fb33" formatted="false">"Please try again."</string>
+    <string name="app_points_earned_9c99c206" formatted="false">"Points earned"</string>
     <string name="app_popular_cities_are_available_offline_enter_9a3c493a" formatted="false">"Popular cities are available offline. Enter coordinates for another place."</string>
     <string name="app_pray_subh_or_duha_30ebb346" formatted="false">"Pray Subh or Duha"</string>
     <string name="app_pray_with_remembrance_56748d7c" formatted="false">"Pray with remembrance"</string>
+    <string name="app_prayer_location_ddaef5b0" formatted="false">"Prayer location"</string>
     <string name="app_prayer_times_1bd9b259" formatted="false">"Prayer times"</string>
+    <string name="app_prayer_times_are_calculated_on_your_phone__7d1188cf" formatted="false">"Prayer times are calculated on your phone. Your location is never uploaded."</string>
     <string name="app_prayer_times_wherever_you_are_d13dff05" formatted="false">"Prayer times, wherever you are"</string>
     <string name="app_prepare_pray_and_remember_bb06b5d6" formatted="false">"Prepare, pray, and remember"</string>
     <string name="app_previous_a57b08a4" formatted="false">"Previous"</string>
@@ -152,16 +189,21 @@
     <string name="app_progress_unavailable_563b460c" formatted="false">"Progress unavailable"</string>
     <string name="app_qatar_55ccc501" formatted="false">"Qatar"</string>
     <string name="app_quick_mode_6cd472b8" formatted="false">"Quick Mode"</string>
+    <string name="app_read_and_count_0b6bbc33" formatted="false">"Read and count"</string>
     <string name="app_read_and_reflect_b35657dd" formatted="false">"Read and reflect"</string>
+    <string name="app_read_count_return_34680336" formatted="false">"Read, count,\nreturn."</string>
+    <string name="app_reading_463816d0" formatted="false">"Reading"</string>
     <string name="app_reminder_unavailable_b73f3f61" formatted="false">"Reminder unavailable"</string>
     <string name="app_reminders_7971dd75" formatted="false">"Reminders"</string>
     <string name="app_remove_from_favorites_18720329" formatted="false">"Remove from favorites"</string>
+    <string name="app_remove_one_1d98e96c" formatted="false">"Remove one"</string>
     <string name="app_reset_daee7606" formatted="false">"Reset"</string>
     <string name="app_rest_with_remembrance_1fc9da21" formatted="false">"Rest with remembrance"</string>
     <string name="app_retry_942087cc" formatted="false">"Retry"</string>
     <string name="app_saffron_6d763d18" formatted="false">"Saffron"</string>
     <string name="app_save_1509f561" formatted="false">"Save"</string>
     <string name="app_save_favorites_d098be12" formatted="false">"Save favorites"</string>
+    <string name="app_save_location_311e149e" formatted="false">"Save location"</string>
     <string name="app_saved_b5c120b3" formatted="false">"Saved"</string>
     <string name="app_search_azkar_b48bc61e" formatted="false">"Search azkar"</string>
     <string name="app_search_cities_86800df7" formatted="false">"Search cities"</string>
@@ -174,29 +216,43 @@
     <string name="app_set_your_location_to_see_prayer_times_alon_f17f02de" formatted="false">"Set your location to see prayer times alongside your daily journeys."</string>
     <string name="app_settings_74a883a0" formatted="false">"Settings"</string>
     <string name="app_shafi_maliki_hanbali_fe1ee8ff" formatted="false">"Shafi, Maliki, Hanbali"</string>
+    <string name="app_shown_under_the_arabic_in_english_b768768c" formatted="false">"Shown under the Arabic in English."</string>
     <string name="app_singapore_c96dd81d" formatted="false">"Singapore"</string>
     <string name="app_skip_28d03596" formatted="false">"Skip"</string>
     <string name="app_slideshow_1d0c5be7" formatted="false">"Slideshow"</string>
+    <string name="app_small_moments_deeper_connection_51b3063c" formatted="false">"Small moments.\nDeeper connection."</string>
     <string name="app_small_steps_from_morning_to_night_56824b27" formatted="false">"Small steps, from morning to night"</string>
+    <string name="app_smaller_text_d13cae54" formatted="false">"Smaller text"</string>
+    <string name="app_start_reading_79f19928" formatted="false">"Start reading"</string>
     <string name="app_start_with_morning_evening_sleep_or_waking_6184fab1" formatted="false">"Start with morning, evening, sleep, or waking azkar."</string>
     <string name="app_subh_45a19dd0" formatted="false">"Subh"</string>
     <string name="app_support_the_app_e85771f6" formatted="false">"Support the app"</string>
     <string name="app_support_the_developer_4353e1c1" formatted="false">"Support the developer"</string>
     <string name="app_system_6725e7bb" formatted="false">"System"</string>
     <string name="app_take_a_moment_for_your_own_dua_c7e643fe" formatted="false">"Take a moment for your own dua."</string>
+    <string name="app_tap_anywhere_on_the_circle_to_count_down_efc473ff" formatted="false">"Tap anywhere on the circle to count down."</string>
+    <string name="app_tap_anywhere_on_the_circle_to_count_c7df3008" formatted="false">"Tap anywhere on the circle to count."</string>
     <string name="app_tap_the_number_to_count_down_c27501b1" formatted="false">"Tap the number to count down"</string>
     <string name="app_tap_the_number_to_count_up_4a90b7de" formatted="false">"Tap the number to count up"</string>
+    <string name="app_tap_the_star_on_any_zikr_to_keep_it_here_6ec8846f" formatted="false">"Tap the star on any zikr to keep it here."</string>
+    <string name="app_tap_to_count_each_zikr_reminders_and_your__0d0327b0" formatted="false">"Tap to count each zikr. Reminders and your progress stay on this device."</string>
     <string name="app_tap_to_count_or_count_down_repeated_azkar_6a4d7558" formatted="false">"Tap to count, or count down repeated azkar."</string>
     <string name="app_teal_fa15a5c1" formatted="false">"Teal"</string>
+    <string name="app_terracotta_433d669d" formatted="false">"Terracotta"</string>
+    <string name="app_text_size_d68761cc" formatted="false">"Text size"</string>
     <string name="app_theme_efb52e71" formatted="false">"Theme"</string>
     <string name="app_time_for_evening_azkar_0a06c53c" formatted="false">"Time for evening azkar"</string>
     <string name="app_time_for_morning_azkar_79111023" formatted="false">"Time for morning azkar"</string>
     <string name="app_time_zone_b9fe1464" formatted="false">"Time zone"</string>
+    <string name="app_today_2b065c7c" formatted="false">"Today"</string>
     <string name="app_today_s_prayer_times_b4e94c5d" formatted="false">"Today's prayer times"</string>
     <string name="app_today_s_progress_14ff52de" formatted="false">"Today's progress"</string>
+    <string name="app_transliteration_1b11d588" formatted="false">"Transliteration"</string>
+    <string name="app_try_another_word_8d9d7caa" formatted="false">"Try another word."</string>
     <string name="app_turkey_diyanet_approximation_dcc89255" formatted="false">"Turkey, Diyanet approximation"</string>
     <string name="app_umm_al_qura_makkah_640e3a1a" formatted="false">"Umm al-Qura, Makkah"</string>
     <string name="app_university_of_islamic_sciences_karachi_c28e7aec" formatted="false">"University of Islamic Sciences, Karachi"</string>
+    <string name="app_up_next_e31da5b2" formatted="false">"Up next"</string>
     <string name="app_upon_waking_a8378091" formatted="false">"Upon Waking"</string>
     <string name="app_use_current_location_9833e6ac" formatted="false">"Use current location"</string>
     <string name="app_use_the_counter_e4304b9e" formatted="false">"Use the counter"</string>
@@ -204,14 +260,19 @@
     <string name="app_visit_the_restroom_65663b2f" formatted="false">"Visit the restroom"</string>
     <string name="app_wake_up_05802f4e" formatted="false">"Wake up"</string>
     <string name="app_wake_prepare_and_begin_with_remembrance_00ca2d35" formatted="false">"Wake, prepare, and begin with remembrance"</string>
+    <string name="app_welcome_to_azkarify_b431ad91" formatted="false">"Welcome to Azkarify"</string>
     <string name="app_when_praying_at_the_mosque_77e781ba" formatted="false">"When praying at the mosque."</string>
     <string name="app_your_daily_journeys_5f2a42ce" formatted="false">"Your daily journeys"</string>
+    <string name="app_your_place_is_kept_while_you_read_acfd6982" formatted="false">"Your place is kept while you read."</string>
     <string name="app_your_points_bb5ad1f5" formatted="false">"Your points"</string>
     <string name="app_your_prayer_journeys_5fba6b67" formatted="false">"Your prayer journeys"</string>
     <string name="app_your_progress_433a720b" formatted="false">"Your progress"</string>
+    <string name="app_your_progress_stays_on_this_device_31901b46" formatted="false">"Your progress stays on this device."</string>
     <string name="app_zikr_lld_of_lld_a94406b1" formatted="false">"Zikr %lld of %lld"</string>
     <string name="app_zikr_added_to_favourites_43619592" formatted="false">"Zikr added to favourites"</string>
+    <string name="app_of_today_s_journeys_complete_53b46d69" formatted="false">"of today's journeys complete"</string>
     <string name="app_of_your_day_complete_c1e3754c" formatted="false">"of your day complete"</string>
+    <string name="app_or_choose_a_city_9db4d08f" formatted="false">"or choose a city"</string>
     <string name="app_label_24568003" formatted="false">"ابحث عن مدينة"</string>
     <string name="app_label_6f317d9c" formatted="false">"ابحث عن منطقة زمنية"</string>
     <string name="app_label_f5bfc23e" formatted="false">"ابدأ رحلتك"</string>

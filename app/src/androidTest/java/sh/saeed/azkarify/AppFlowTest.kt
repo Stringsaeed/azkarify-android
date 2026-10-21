@@ -55,7 +55,9 @@ class AppFlowTest {
     }
     @get:Rule val rules: RuleChain = RuleChain.outerRule(reset).around(compose)
 
+    /** Opens the Azkar tab and waits for its topics. */
     private fun awaitTopics() {
+        compose.onNodeWithTag("tab.Azkar").performClick()
         try {
             compose.waitUntil(10_000) {
                 compose
@@ -87,14 +89,13 @@ class AppFlowTest {
             .onNodeWithTag("azkarCategoryList")
             .performScrollToNode(hasContentDescription("Add to favorites"))
         compose.onAllNodesWithContentDescription("Add to favorites").onFirst().performClick()
-        compose.onNodeWithContentDescription("Menu").performClick()
-        compose.onNodeWithText("Favorites").performClick()
+        compose.onNodeWithText("Favourites").performClick()
         compose
             .onNodeWithText("Words of remembrance for morning and evening")
             .assertIsDisplayed()
             .performClick()
-        compose.onNodeWithTag("azkarEntriesList").performScrollToNode(hasText("📿  3"))
-        compose.onAllNodesWithText("📿  3").onFirst().performScrollTo().performClick()
+        compose.onNodeWithTag("azkarEntriesList").performScrollToNode(hasContentDescription("Count down from 3"))
+        compose.onAllNodesWithContentDescription("Count down from 3").onFirst().performScrollTo().performClick()
         compose.waitUntil(5_000) {
             compose.onAllNodesWithContentDescription("Count: 3").fetchSemanticsNodes().isNotEmpty()
         }
@@ -126,8 +127,8 @@ class AppFlowTest {
     @Test
     fun returningFromScreensDoesNotFocusSearch() {
         awaitTopics()
-        compose.onNodeWithContentDescription("Settings").performClick()
-        compose.onNodeWithContentDescription("Back").performClick()
+        compose.onNodeWithTag("tab.Settings").performClick()
+        compose.onNodeWithTag("tab.Azkar").performClick()
         compose.onNodeWithContentDescription("Search azkar").assertIsNotFocused()
         compose
             .onNodeWithContentDescription("Search azkar")
@@ -193,26 +194,25 @@ class AppFlowTest {
     @Test
     fun languageAndThemePersistAfterActivityRecreation() {
         awaitTopics()
-        compose.onNodeWithContentDescription("Settings").performClick()
+        compose.onNodeWithTag("tab.Settings").performClick()
         compose.onNodeWithText("Language").performClick()
         compose.onNodeWithText("العربية").performClick()
         compose.waitUntil(5_000) {
-            compose.onAllNodesWithText("المظهر").fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodesWithText("ليلي").fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onNodeWithText("المظهر").performClick()
-        compose.onNodeWithText("داكن").performClick()
+        compose.onNodeWithText("ليلي").performClick()
         compose.activityRule.scenario.recreate()
         compose.waitUntil(5_000) {
-            compose.onAllNodesWithText("داكن").fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodesWithText("ليلي").fetchSemanticsNodes().isNotEmpty()
         }
         compose.onNodeWithText("العربية").assertIsDisplayed()
-        compose.onNodeWithText("داكن").assertIsDisplayed()
+        compose.onNodeWithText("ليلي").assertIsSelected()
     }
 
     @Test
     fun reminderTimePickerSavesAndCancelsDrafts() {
         awaitTopics()
-        compose.onNodeWithContentDescription("Settings").performClick()
+        compose.onNodeWithTag("tab.Settings").performClick()
         compose.onNodeWithText("08:00").performScrollTo().performClick()
         compose.onNodeWithContentDescription("Switch to text input mode").performClick()
         compose
@@ -239,9 +239,8 @@ class AppFlowTest {
     @Test
     fun journeyCompletionAwardsPointsAndSurvivesRecreation() {
         awaitTopics()
-        compose.onNodeWithContentDescription("Menu").performClick()
-        compose.onNodeWithText("Journeys").performClick()
-        compose.onNodeWithTag("azkarJourneyList").performScrollToNode(hasText("Heading out"))
+        compose.onNodeWithTag("tab.Today").performClick()
+        compose.onNodeWithTag("todayList").performScrollToNode(hasText("Heading out"))
         compose.onNodeWithText("Heading out").performClick()
         compose.waitUntil(5_000) {
             compose
@@ -253,23 +252,25 @@ class AppFlowTest {
         compose.waitUntil(5_000) {
             compose.onAllNodesWithText("Journey complete").fetchSemanticsNodes().isNotEmpty()
         }
+        // The completion sheet celebrates once; dismiss it to reach the timeline again.
+        compose.onNodeWithText("Done").performClick()
         compose.onNodeWithText("Journey complete").assertIsDisplayed()
-        compose
-            .onNode(hasText(" 35 ") and hasAnyAncestor(hasTestTag("azkarDetailPane")))
-            .assertIsDisplayed()
+        compose.onNodeWithContentDescription("Your points, 35").assertIsDisplayed()
         compose.onNodeWithContentDescription("Mark incomplete: Leaving home azkar").performClick()
+        compose.waitUntil(5_000) {
+            compose
+                .onAllNodesWithContentDescription("Mark complete: Leaving home azkar")
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
         compose.onNodeWithContentDescription("Mark complete: Leaving home azkar").performClick()
-        compose
-            .onNode(hasText(" 35 ") and hasAnyAncestor(hasTestTag("azkarDetailPane")))
-            .assertIsDisplayed()
+        compose.onNodeWithContentDescription("Your points, 35").assertIsDisplayed()
         compose.activityRule.scenario.recreate()
         compose.waitForIdle()
         compose.waitUntil(5_000) {
             compose.onAllNodesWithText("Journey complete").fetchSemanticsNodes().isNotEmpty()
         }
         compose.onNodeWithText("Journey complete").assertIsDisplayed()
-        compose
-            .onNode(hasText(" 35 ") and hasAnyAncestor(hasTestTag("azkarDetailPane")))
-            .assertIsDisplayed()
+        compose.onNodeWithContentDescription("Your points, 35").assertIsDisplayed()
     }
 }

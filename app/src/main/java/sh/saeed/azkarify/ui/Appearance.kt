@@ -5,39 +5,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import sh.saeed.azkarify.data.AppState
-import sh.saeed.azkarify.ui.theme.AlanSans
+import sh.saeed.azkarify.ui.components.AzIcon
+import sh.saeed.azkarify.ui.components.AzSymbol
 import sh.saeed.azkarify.ui.theme.Az
 import sh.saeed.azkarify.ui.theme.AzAccent
 import sh.saeed.azkarify.ui.theme.AzBorder
 import sh.saeed.azkarify.ui.theme.AzRadius
-import sh.saeed.azkarify.ui.theme.AzColors
-import sh.saeed.azkarify.ui.theme.AzDayColors
 import sh.saeed.azkarify.ui.theme.AzTheme
-
-data class Palette(
-    val accent: Color,
-    val background: Color,
-    val text: Color,
-    val secondary: Color,
-    val dark: Boolean,
-)
-
-val LocalPalette = staticCompositionLocalOf { palette(AzDayColors) }
-
-/** Screens not yet moved to the design system components read these roles from the tokens. */
-fun palette(colors: AzColors) =
-    Palette(colors.accent, colors.paper, colors.ink, colors.inkMuted, colors.isDark)
 
 @Composable
 fun AzkarTheme(state: AppState, content: @Composable () -> Unit) {
@@ -48,22 +29,8 @@ fun AzkarTheme(state: AppState, content: @Composable () -> Unit) {
             else -> isSystemInDarkTheme()
         }
     AzTheme(dark, AzAccent.of(state.accent), arabic = state.language == "ar") {
-        val colors = Az.colors
-        val p = remember(colors) { palette(colors) }
-        CompositionLocalProvider(LocalPalette provides p, content = content)
+        content()
     }
-}
-
-@Composable
-fun AppCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    val colors = Az.colors
-    OutlinedCard(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(AzRadius.md),
-        colors = CardDefaults.outlinedCardColors(containerColor = colors.paperRaised),
-        border = BorderStroke(AzBorder.hairline, colors.lineStrong),
-        content = content,
-    )
 }
 
 @Composable
@@ -105,14 +72,14 @@ fun AppDropdownMenuItem(
     selected: Boolean = false,
     enabled: Boolean = true,
 ) {
-    val p = LocalPalette.current
+    val colors = Az.colors
     val itemColors =
         MenuDefaults.itemColors(
-            textColor = if (selected) p.accent else p.text,
-            leadingIconColor = p.accent,
-            trailingIconColor = p.accent,
-            disabledTextColor = p.secondary.copy(alpha = 0.5f),
-            disabledLeadingIconColor = p.secondary.copy(alpha = 0.5f),
+            textColor = if (selected) colors.accent else colors.ink,
+            leadingIconColor = colors.accent,
+            trailingIconColor = colors.accent,
+            disabledTextColor = colors.inkMuted.copy(alpha = 0.5f),
+            disabledLeadingIconColor = colors.inkMuted.copy(alpha = 0.5f),
         )
 
     val itemModifier =
@@ -120,7 +87,7 @@ fun AppDropdownMenuItem(
             modifier
                 .padding(horizontal = 6.dp, vertical = 2.dp)
                 .background(
-                    color = lerp(Az.colors.paperRaised, p.accent, 0.10f),
+                    color = colors.paperSunk,
                     shape = RoundedCornerShape(10.dp),
                 )
         } else {
@@ -131,10 +98,7 @@ fun AppDropdownMenuItem(
         text = {
             ProvideTextStyle(
                 value =
-                    MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                        fontFamily = AlanSans,
-                    )
+                    Az.type.body.copy(fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal)
             ) {
                 text()
             }
@@ -145,7 +109,7 @@ fun AppDropdownMenuItem(
         trailingIcon =
             trailingIcon
                 ?: if (selected) {
-                    { Icon(Icons.Outlined.Check, contentDescription = null, tint = p.accent) }
+                    { AzIcon(AzSymbol.check, null, tint = colors.accent) }
                 } else null,
         enabled = enabled,
         colors = itemColors,
@@ -159,11 +123,4 @@ fun AppMenuDivider(modifier: Modifier = Modifier) {
         modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp),
         color = Az.colors.line,
     )
-}
-
-/** The botanical scenery is retired; screens keep a plain paper ground until they move to tokens. */
-@Suppress("UNUSED_PARAMETER")
-@Composable
-fun BotanicalBackground(variant: Int = 0) {
-    Box(Modifier.fillMaxSize().background(LocalPalette.current.background))
 }
