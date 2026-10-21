@@ -41,6 +41,7 @@ import java.util.Date
 import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.launch
+import sh.saeed.azkarify.ui.theme.AzAccent
 
 @Composable
 fun SettingsScreen(state: AppState, model: AppViewModel, go: (Destination) -> Unit) {
@@ -199,7 +200,7 @@ fun SettingsScreen(state: AppState, model: AppViewModel, go: (Destination) -> Un
                         ) {
                             Box(
                                 Modifier.size(24.dp)
-                                    .background(palette(id, p.dark).accent, CircleShape)
+                                    .background(AzAccent.of(id).let { if (p.dark) it.night else it.day }, CircleShape)
                             )
                             Text(
                                 state.text(title),
