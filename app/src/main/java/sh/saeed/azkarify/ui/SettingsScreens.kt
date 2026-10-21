@@ -712,7 +712,7 @@ private fun ReminderRow(kind: String, state: AppState, model: AppViewModel, divi
                 onClick = { showTimePicker = true },
                 label = {
                     Text(
-                        String.format(Locale.forLanguageTag(state.language), "%02d:%02d", hour, minute),
+                        String.format(numberLocale(state.language), "%02d:%02d", hour, minute),
                         style = Az.type.callout.copy(fontFeatureSettings = "tnum"),
                     )
                 },

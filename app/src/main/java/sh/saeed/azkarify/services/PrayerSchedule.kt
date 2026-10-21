@@ -154,7 +154,7 @@ object PrayerSchedule {
     }
 
     fun format(date: Date, config: PrayerConfiguration, language: String): String =
-        DateFormat.getTimeInstance(DateFormat.SHORT, Locale.forLanguageTag(language))
+        DateFormat.getTimeInstance(DateFormat.SHORT, sh.saeed.azkarify.ui.numberLocale(language))
             .apply { timeZone = TimeZone.getTimeZone(config.timeZone) }
             .format(date)
 }
