@@ -46,6 +46,20 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import androidx.compose.animation.core.animate
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Velocity
+import kotlin.math.roundToInt
+import sh.saeed.azkarify.ui.theme.AzDuration
+import sh.saeed.azkarify.ui.theme.azTween
 import sh.saeed.azkarify.data.AppState
 import sh.saeed.azkarify.data.AppViewModel
 import sh.saeed.azkarify.data.Category
@@ -84,7 +98,8 @@ internal fun AzkarScreen(
                 (!favorites || it.id in state.favorites) && it.title.contains(query, ignoreCase = true)
             }
         }
-    Column(Modifier.fillMaxSize().statusBarsPadding()) {
+    val collapsing = remember { CollapsingSearch() }
+    Column(Modifier.fillMaxSize().statusBarsPadding().nestedScroll(collapsing)) {
         Text(
             state.text("Azkar"),
             Modifier
@@ -94,7 +109,7 @@ internal fun AzkarScreen(
             style = Az.type.title1,
             color = colors.ink,
         )
-        ListSearchBar(search, onSearch, state)
+        CollapsingHeader(collapsing) { ListSearchBar(search, onSearch, state) }
         Row(
             Modifier
                 .fillMaxWidth()
@@ -178,6 +193,49 @@ internal fun AzkarScreen(
                 )
             }
         }
+    }
+}
+
+/**
+ * Hides the search field as the list scrolls down and brings it back on any scroll up, like an
+ * enter-always app bar. The offset is read only in layout, so scrolling never recomposes.
+ */
+private class CollapsingSearch : NestedScrollConnection {
+    var height = 0f
+    var offset by mutableFloatStateOf(0f)
+    /** Stays open while the field has focus, so typing never scrolls it away. */
+    var pinned = false
+
+    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+        if (pinned || available.y == 0f) return Offset.Zero
+        val before = offset
+        offset = (offset + available.y).coerceIn(-height, 0f)
+        return Offset(0f, offset - before)
+    }
+
+    override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+        // Settle a half-hidden field to whichever end is nearer.
+        if (offset != 0f && offset != -height) {
+            val target = if (offset < -height / 2) -height else 0f
+            animate(offset, target, animationSpec = azTween(AzDuration.fast)) { value, _ -> offset = value }
+        }
+        return Velocity.Zero
+    }
+}
+
+@Composable
+private fun CollapsingHeader(state: CollapsingSearch, content: @Composable () -> Unit) {
+    Layout(
+        content,
+        Modifier.clipToBounds().onFocusChanged {
+            state.pinned = it.hasFocus
+            if (it.hasFocus) state.offset = 0f
+        },
+    ) { measurables, constraints ->
+        val placeable = measurables.first().measure(constraints)
+        state.height = placeable.height.toFloat()
+        val offset = state.offset.coerceAtLeast(-state.height).roundToInt()
+        layout(placeable.width, placeable.height + offset) { placeable.place(0, offset) }
     }
 }
 

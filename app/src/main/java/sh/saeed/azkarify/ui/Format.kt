@@ -12,12 +12,16 @@ import java.util.concurrent.ConcurrentHashMap
 import sh.saeed.azkarify.data.AppState
 
 /**
- * Locale for numbers and dates in the UI language. Arabic UI follows the system region, so
- * digits are Arabic-Indic (٣٣) where the system locale uses them and Latin where it does not.
+ * Locale for numbers and dates in the UI language. Arabic UI always uses Arabic-Indic digits
+ * (٣٣), as on iOS, while month and day names follow the system region.
  */
 fun numberLocale(language: String): Locale =
     if (language == "ar")
-        Locale.Builder().setLanguage("ar").setRegion(Locale.getDefault().country.ifEmpty { "EG" }).build()
+        Locale.Builder()
+            .setLanguage("ar")
+            .setRegion(Locale.getDefault().country.ifEmpty { "EG" })
+            .setUnicodeLocaleKeyword("nu", "arab")
+            .build()
     else Locale.forLanguageTag(language)
 
 private val formats = ConcurrentHashMap<String, NumberFormat>()
