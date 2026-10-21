@@ -1,433 +1,272 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package sh.saeed.azkarify.ui
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
-import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.*
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import sh.saeed.azkarify.R
-import sh.saeed.azkarify.data.*
-import sh.saeed.azkarify.services.PrayerSchedule
 import java.util.Date
-import kotlin.time.Duration.Companion.milliseconds
+import sh.saeed.azkarify.data.AppState
+import sh.saeed.azkarify.data.AppViewModel
+import sh.saeed.azkarify.data.Category
+import sh.saeed.azkarify.data.Journey
+import sh.saeed.azkarify.data.JourneyProgress
+import sh.saeed.azkarify.data.Step
+import sh.saeed.azkarify.services.PrayerSchedule
+import sh.saeed.azkarify.ui.components.AzButton
+import sh.saeed.azkarify.ui.components.AzCard
+import sh.saeed.azkarify.ui.components.AzChevron
+import sh.saeed.azkarify.ui.components.AzChip
+import sh.saeed.azkarify.ui.components.AzEyebrow
+import sh.saeed.azkarify.ui.components.AzIcon
+import sh.saeed.azkarify.ui.components.AzIconButton
+import sh.saeed.azkarify.ui.components.AzPill
+import sh.saeed.azkarify.ui.components.AzPillTone
+import sh.saeed.azkarify.ui.components.AzPointsBadge
+import sh.saeed.azkarify.ui.components.AzProgressTrack
+import sh.saeed.azkarify.ui.components.AzRail
+import sh.saeed.azkarify.ui.components.AzStepMarker
+import sh.saeed.azkarify.ui.components.AzStepRow
+import sh.saeed.azkarify.ui.components.AzStepState
+import sh.saeed.azkarify.ui.components.AzSymbol
+import sh.saeed.azkarify.ui.theme.Az
+import sh.saeed.azkarify.ui.theme.AzSpace
 
-@Composable
-fun JourneysScreen(state: AppState, model: AppViewModel, day: String, go: (Destination) -> Unit) {
-    val p = LocalPalette.current
-    val completed = state.journeys.sumOf { model.progress.completedCount(day, it) }
-    val total = state.journeys.sumOf { it.requiredSteps.size }
-    var now by remember { mutableStateOf(Date()) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            now = Date()
-            kotlinx.coroutines.delay(30_000.milliseconds)
-        }
+/** The section a journey sits in on Today, for its eyebrow. */
+private fun section(journey: Journey, state: AppState): String {
+    val index = state.journeys.filter { it.prayer == null }.indexOf(journey)
+    return when {
+        journey.prayer != null -> state.text("02 / Through the day")
+        index in 0..1 -> state.text("01 / Morning")
+        else -> state.text("03 / Evening")
     }
-    val schedule =
-        remember(state.prayerConfiguration, day, now.time / 60_000) {
-            state.prayerConfiguration?.let { PrayerSchedule.calculate(it, now) }
+}
+
+/**
+ * One journey's timeline. Completing the last required step reports the points it earned so the
+ * completion sheet can celebrate it once.
+ */
+@Composable
+internal fun JourneyScreen(
+    state: AppState,
+    model: AppViewModel,
+    journey: Journey,
+    day: String,
+    onBack: () -> Unit,
+    onPoints: () -> Unit,
+    onCategory: (Int) -> Unit,
+    onRead: (Int) -> Unit,
+    onComplete: (Journey, Int) -> Unit,
+) {
+    val colors = Az.colors
+    // Read so a saved step refreshes the screen.
+    state.progressVersion
+    val progress = model.progress
+    val count = progress.completedCount(day, journey)
+    val required = journey.requiredSteps.size
+    val cue = rememberCounterCue()
+    val nextStep = journey.steps.firstOrNull { !it.optional && !progress.completed(day, journey, it) }
+    val time =
+        remember(state.prayerConfiguration, journey.prayer, day) {
+            journey.prayer?.let { id ->
+                state.prayerConfiguration?.let { config ->
+                    PrayerSchedule.calculate(config, Date()).firstOrNull { it.id == id }?.let {
+                        PrayerSchedule.format(it.time, config, state.language)
+                    }
+                }
+            }
         }
-    val next =
-        schedule
-            ?.firstOrNull {
-                it.time > now &&
-                    state.journeys
-                        .firstOrNull { j -> j.prayer == it.id }
-                        ?.let { j -> !model.progress.complete(day, j) } == true
-            }
-            ?.id
-    Box {
-        BotanicalBackground(2)
+    Scaffold(
+        containerColor = colors.paper,
+        topBar = {
+            TopAppBar(
+                title = { Text(journey.title, style = Az.type.headline, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                navigationIcon = { AzIconButton(AzSymbol.back, state.text("Back"), onBack) },
+                actions = {
+                    AzPointsBadge(state.number(progress.points), state.text("Your points"), onPoints, Modifier.padding(end = AzSpace.xs))
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.paper, titleContentColor = colors.ink),
+            )
+        },
+    ) { insets ->
         LazyColumn(
-            Modifier.fillMaxSize().testTag("azkarJourneyList"),
-            contentPadding = PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxSize().testTag("journeySteps"),
+            contentPadding =
+                PaddingValues(
+                    start = AzSpace.gutter,
+                    end = AzSpace.gutter,
+                    top = insets.calculateTopPadding() + AzSpace.md,
+                    bottom = insets.calculateBottomPadding() + AzSpace.xxl,
+                ),
         ) {
-            item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            state.text("A little, every day"),
-                            fontSize = 29.sp,
-                            fontWeight = FontWeight.Bold,
-                            lineHeight = 36.sp,
-                        )
-                        Text(
-                            state.text("Follow a journey at your own pace."),
-                            fontSize = 16.sp,
-                            color = p.secondary,
-                        )
-                    }
-                    Image(
-                        painterResource(R.drawable.journey_crescent),
-                        null,
-                        Modifier.size(width = 84.dp, height = 110.dp),
+            item(key = "header") {
+                Column(Modifier.padding(bottom = 22.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    AzEyebrow(
+                        section(journey, state) + " · " +
+                            state.text("%s steps").replace("%s", state.number(journey.steps.size))
                     )
-                }
-            }
-            item {
-                Column(
-                    Modifier.fillMaxWidth()
-                        .background(p.accent.copy(alpha = .07f), RoundedCornerShape(20.dp))
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.Eco, null, tint = p.accent)
-                        Column(Modifier.padding(start = 12.dp).weight(1f)) {
-                            Text(
-                                state.text("Today's progress"),
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = p.accent,
-                            )
-                            Text(
-                                state.text("of your day complete"),
-                                fontSize = 13.sp,
-                                color = p.secondary,
-                            )
+                    Text(journey.subtitle, style = Az.type.title1, color = colors.ink)
+                    time?.let {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            AzIcon(AzSymbol.schedule, null, size = 18.dp, tint = colors.inkMuted)
+                            Text(it, style = Az.type.callout.copy(fontFeatureSettings = "tnum"), color = colors.inkMuted)
                         }
-                        Text(
-                            "${if(total>0) completed*100/total else 0}%",
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = p.accent,
-                        )
                     }
-                    LinearProgressIndicator(
-                        progress = { if (total > 0) completed.toFloat() / total else 0f },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = p.accent,
-                        trackColor = p.accent.copy(alpha = .15f),
+                    Text(
+                        state.text("Complete each step when you're ready. Your progress starts fresh each day."),
+                        style = Az.type.footnote,
+                        color = colors.inkMuted,
                     )
-                }
-            }
-            state.journeys.forEachIndexed { index, journey ->
-                if (index == 0 || index == 2 || index == 7)
-                    item {
-                        Row(
-                            Modifier.padding(top = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                when (index) {
-                                    0 -> state.text("Begin your day")
-                                    2 -> state.text("Your prayer journeys")
-                                    else -> state.text("As the day settles")
-                                },
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.weight(1f),
-                            )
-                            if (index == 2)
-                                IconButton(onClick = { go(Destination.Prayer) }) {
-                                    Icon(
-                                        Icons.Outlined.Schedule,
-                                        state.text("Set prayer times"),
-                                        tint = p.accent,
-                                    )
-                                }
-                        }
-                        if (index == 2 && state.prayerConfiguration == null)
-                            TextButton(onClick = { go(Destination.Prayer) }) {
-                                Text(
-                                    state.text("Set your location for prayer times"),
-                                    fontSize = 14.sp,
-                                )
-                            }
-                    }
-                item(key = journey.id) {
-                    val count = model.progress.completedCount(day, journey)
-                    val complete = model.progress.complete(day, journey)
-                    val time =
-                        schedule
-                            ?.firstOrNull { it.id == journey.prayer }
-                            ?.let {
-                                PrayerSchedule.format(
-                                    it.time,
-                                    state.prayerConfiguration!!,
-                                    state.language,
-                                )
-                            }
-                    Column(
-                        Modifier.fillMaxWidth()
-                            .background(p.background.copy(alpha = .92f), RoundedCornerShape(22.dp))
-                            .border(
-                                if (next == journey.prayer) 2.dp else 1.dp,
-                                p.accent.copy(
-                                    alpha =
-                                        if (next == journey.prayer) .8f
-                                        else if (complete) .3f else .12f
-                                ),
-                                RoundedCornerShape(22.dp),
-                            )
-                            .clickable { go(Destination.Journey(journey.id)) }
-                            .padding(18.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                    Row(
+                        Modifier.padding(top = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(AzSpace.sm),
                     ) {
-                        if (next == journey.prayer && journey.prayer != null)
-                            Text(
-                                state.text("Next prayer"),
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = p.accent,
-                            )
-                        Row(
-                            verticalAlignment = Alignment.Top,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            Icon(
-                                if (complete) Icons.Outlined.Check
-                                else
-                                    when (journey.id) {
-                                        "morning" -> Icons.Outlined.WbTwilight
-                                        "going-out" -> Icons.Outlined.DoorFront
-                                        "evening" -> Icons.Outlined.WbTwilight
-                                        "sleep" -> Icons.Outlined.NightsStay
-                                        else -> Icons.Outlined.WbSunny
-                                    },
-                                null,
-                                tint = p.accent,
-                                modifier =
-                                    Modifier.size(44.dp)
-                                        .background(p.accent.copy(alpha = .08f), CircleShape)
-                                        .padding(11.dp),
-                            )
-                            Column(
-                                Modifier.weight(1f),
-                                verticalArrangement = Arrangement.spacedBy(5.dp),
-                            ) {
-                                Text(journey.title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                                Text(
-                                    time ?: journey.subtitle,
-                                    fontSize = if (time == null) 13.sp else 14.sp,
-                                    color = if (time == null) p.secondary else p.accent,
-                                )
-                            }
-                            Icon(
-                                Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                                null,
-                                Modifier.padding(top = 14.dp).size(15.dp),
-                                tint = p.secondary,
-                            )
-                        }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            LinearProgressIndicator(
-                                progress = { count.toFloat() / journey.requiredSteps.size },
-                                modifier = Modifier.weight(1f),
-                                color = p.accent,
-                                trackColor = p.accent.copy(alpha = .15f),
-                            )
-                            Text(
-                                if (complete) state.text("Complete")
-                                else "$count / ${journey.requiredSteps.size}",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = p.accent,
-                            )
-                        }
+                        val complete = progress.complete(day, journey)
+                        AzProgressTrack(if (required > 0) count.toFloat() / required else 0f, Modifier.weight(1f), complete = complete)
+                        Text(
+                            if (complete) state.text("Journey complete") else state.count(count, required),
+                            style = Az.type.footnote.copy(fontWeight = Az.type.headline.fontWeight),
+                            color = if (complete) colors.forest else colors.ink,
+                        )
                     }
                 }
+            }
+            itemsIndexed(journey.steps, key = { _, step -> step.id }) { index, step ->
+                StepItem(
+                    state,
+                    model,
+                    journey,
+                    step,
+                    index,
+                    day,
+                    isNext = step == nextStep,
+                    last = index == journey.steps.lastIndex,
+                    onCategory = onCategory,
+                    onRead = onRead,
+                    onToggle = {
+                        val before = progress.points
+                        val wasComplete = progress.complete(day, journey)
+                        model.toggleStep(day, journey, step) { saved: JourneyProgress ->
+                            val done = saved.complete(day, journey)
+                            cue.play(if (done) 2 else if (saved.completed(day, journey, step)) 0 else 1)
+                            // Celebrate once a day: completing again after an undo earns nothing new.
+                            if (done && !wasComplete && saved.points > before) onComplete(journey, saved.points - before)
+                        }
+                    },
+                )
             }
         }
     }
 }
 
 @Composable
-fun JourneyDetail(
+private fun StepItem(
     state: AppState,
     model: AppViewModel,
     journey: Journey,
+    step: Step,
+    index: Int,
     day: String,
-    open: (Int) -> Unit,
+    isNext: Boolean,
+    last: Boolean,
+    onCategory: (Int) -> Unit,
+    onRead: (Int) -> Unit,
+    onToggle: () -> Unit,
 ) {
-    val p = LocalPalette.current
-    val count = model.progress.completedCount(day, journey)
-    val cue = rememberCounterCue()
-    Box {
-        BotanicalBackground(3)
-        LazyColumn(
-            Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Text(journey.subtitle, fontSize = 23.sp, fontWeight = FontWeight.Bold)
-                    journey.prayer?.let { prayer ->
-                        state.prayerConfiguration?.let { config ->
-                            PrayerSchedule.calculate(config, Date())
-                                .firstOrNull { it.id == prayer }
-                                ?.let {
-                                    Text(
-                                        PrayerSchedule.format(it.time, config, state.language),
-                                        fontSize = 16.sp,
-                                        color = p.accent,
-                                    )
-                                }
-                        }
+    val colors = Az.colors
+    val progress = model.progress
+    val completed = progress.completed(day, journey, step)
+    val choice = progress.choice(day, journey, step)
+    val needsChoice = step.options.isNotEmpty() && choice.isEmpty()
+    val categories: List<Category> = step.categories.mapNotNull { id -> state.categories.firstOrNull { it.id == id } }
+    AzStepRow(
+        marker = {
+            AzStepMarker(
+                state.number(index + 1),
+                when {
+                    completed -> AzStepState.Done
+                    isNext && !needsChoice -> AzStepState.Next
+                    else -> AzStepState.Todo
+                },
+                accessibilityLabel =
+                    if (needsChoice) state.text("Choose the prayer for this routine.")
+                    else state.text(if (completed) "Mark incomplete: " else "Mark complete: ") + step.title,
+                accessibilityState = state.text(if (completed) "Complete" else "Incomplete"),
+                onClick = onToggle,
+                enabled = state.progressReady && !needsChoice,
+            )
+        },
+        rail =
+            when {
+                last -> AzRail.None
+                completed -> AzRail.Solid
+                else -> AzRail.Dashed
+            },
+    ) {
+        val body: @Composable () -> Unit = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AzSpace.xs)) {
+                    Text(step.title, Modifier.weight(1f), style = Az.type.headline, color = colors.ink)
+                    when {
+                        isNext && !completed -> AzPill(state.text("Up next"), tone = AzPillTone.Accent)
+                        step.optional -> AzPill(state.text("Optional"))
                     }
-                    Text(
-                        state.text(
-                            "Complete each step when you're ready. Your progress starts fresh each day."
-                        ),
-                        fontSize = 14.sp,
-                        color = p.secondary,
-                    )
-                    Row {
-                        Text(
-                            if (model.progress.complete(day, journey))
-                                state.text("Journey complete")
-                            else state.text("Your progress"),
-                            fontWeight = FontWeight.Bold,
-                            color = p.accent,
-                            modifier = Modifier.weight(1f),
-                        )
-                        Text(
-                            "$count / ${journey.requiredSteps.size}",
-                            fontSize = 14.sp,
-                            color = p.accent,
-                        )
-                    }
-                    LinearProgressIndicator(
-                        progress = { count.toFloat() / journey.requiredSteps.size },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = p.accent,
-                        trackColor = p.accent.copy(alpha = .15f),
-                    )
                 }
-            }
-            items(journey.steps, key = { it.id }) { step ->
-                val completed = model.progress.completed(day, journey, step)
-                val choice = model.progress.choice(day, journey, step)
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(
-                        Modifier.size(44.dp)
-                            .padding(3.dp)
-                            .background(if (completed) p.accent else p.background, CircleShape)
-                            .border(1.dp, p.accent.copy(alpha = .55f), CircleShape)
-                            .clickable(
-                                enabled =
-                                    state.progressReady &&
-                                        (step.options.isEmpty() || choice.isNotEmpty())
-                            ) {
-                                model.toggleStep(day, journey, step) { saved ->
-                                    cue.play(
-                                        if (saved.complete(day, journey)) 2
-                                        else if (saved.completed(day, journey, step)) 0 else 1
-                                    )
-                                }
-                            }
-                            .semantics {
-                                contentDescription =
-                                    state.text(
-                                        if (completed) "Mark incomplete: " else "Mark complete: "
-                                    ) + step.title
-                                selected = completed
-                            },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (completed)
-                            Icon(
-                                Icons.Outlined.Check,
-                                null,
-                                tint = p.background,
-                                modifier = Modifier.size(18.dp),
-                            )
-                        else
-                            Text(
-                                "${journey.steps.indexOf(step)+1}",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = p.accent,
-                            )
-                    }
-                    Column(
-                        Modifier.weight(1f)
-                            .background(p.background.copy(alpha = .92f), RoundedCornerShape(18.dp))
-                            .border(
-                                1.dp,
-                                p.accent.copy(alpha = if (completed) .3f else .1f),
-                                RoundedCornerShape(18.dp),
-                            )
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        Text(step.title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                        if (step.optional)
-                            Text(state.text("Optional"), fontSize = 12.sp, color = p.accent)
-                        if (step.note.isNotEmpty())
-                            Text(step.note, fontSize = 14.sp, color = p.secondary)
+                if (step.note.isNotEmpty()) Text(step.note, style = Az.type.footnote, color = colors.inkMuted)
+                if (step.options.isNotEmpty()) {
+                    Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(AzSpace.xs)) {
                         step.options.forEach { (id, title) ->
-                            Row(
-                                Modifier.fillMaxWidth().heightIn(min = 44.dp).clickable(
-                                    enabled = state.progressReady
-                                ) {
-                                    model.choose(day, journey, step, id)
-                                },
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                RadioButton(
-                                    selected = choice == id,
-                                    enabled = state.progressReady,
-                                    onClick = { model.choose(day, journey, step, id) },
-                                )
-                                Text(title, fontSize = 15.sp, color = p.accent)
-                            }
-                        }
-                        step.categories.forEach { id ->
-                            state.categories
-                                .firstOrNull { it.id == id }
-                                ?.let { category ->
-                                    Row(
-                                        Modifier.fillMaxWidth().heightIn(min = 44.dp).clickable {
-                                            open(id)
-                                        },
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    ) {
-                                        Icon(
-                                            Icons.AutoMirrored.Outlined.MenuBook,
-                                            null,
-                                            Modifier.size(16.dp),
-                                            tint = p.accent,
-                                        )
-                                        Text(
-                                            category.title,
-                                            fontSize = 14.sp,
-                                            color = p.accent,
-                                            modifier = Modifier.weight(1f),
-                                        )
-                                        Icon(
-                                            Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                                            null,
-                                            Modifier.size(14.dp),
-                                            tint = p.accent,
-                                        )
-                                    }
-                                }
+                            AzChip(title, choice == id, { if (state.progressReady) model.choose(day, journey, step, id) })
                         }
                     }
                 }
+                categories.forEach { category ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 44.dp)
+                            .clickable(role = Role.Button) { onCategory(category.id) },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        AzIcon(AzSymbol.azkar, null, size = 18.dp, tint = colors.accent)
+                        Text(category.title, Modifier.weight(1f), style = Az.type.callout, color = colors.accent)
+                        if (isNext && !completed) AzChevron()
+                    }
+                }
+                if (isNext && !completed && categories.isNotEmpty())
+                    AzButton(
+                        state.text("Start reading"),
+                        { onRead(categories.first().id) },
+                        Modifier.padding(top = 4.dp),
+                        small = true,
+                    )
             }
         }
+        if (isNext && !completed)
+            AzCard(compact = true) { body() }
+        else body()
     }
 }

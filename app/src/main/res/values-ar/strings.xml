@@ -1,24 +1,40 @@
 <resources>
     <string name="app_name">Azkarify</string>
+    <string name="app_1_s_of_2_s_steps_completed_1ee93568" formatted="false">"%1$s من %2$s خطوات مكتملة"</string>
     <string name="app_lld_daea457f" formatted="false">"%lld"</string>
     <string name="app_1_lld_2_lld_1945d1f7" formatted="false">"%lld / %lld"</string>
+    <string name="app_s_points_in_total_358bfc93" formatted="false">"%s نقطة إجمالًا"</string>
+    <string name="app_s_steps_7e278bfe" formatted="false">"%s خطوات"</string>
+    <string name="app_s_to_your_next_point_6cd46c65" formatted="false">"%s للنقطة التالية"</string>
     <string name="app_0_0000_297d62f3" formatted="false">"0.0000"</string>
+    <string name="app_01_morning_923ffa0a" formatted="false">"٠١ / الصباح"</string>
+    <string name="app_02_through_the_day_cc36e497" formatted="false">"٠٢ / خلال اليوم"</string>
+    <string name="app_03_evening_2c2b7347" formatted="false">"٠٣ / المساء"</string>
     <string name="app_1_point_for_every_33_counts_d526a922" formatted="false">"نقطة واحدة لكل ٣٣ تسبيحة"</string>
     <string name="app_10_points_for_each_step_and_25_for_complet_882ef6fd" formatted="false">"١٠ نقاط لكل خطوة و٢٥ نقطة لإكمال الرحلة."</string>
     <string name="app_a_gentle_morning_e27bbbc5" formatted="false">"بداية صباحك"</string>
+    <string name="app_a_little_every_day_43f65c43" formatted="false">"قليلٌ دائم،\nكل يوم."</string>
     <string name="app_a_little_every_day_2ae5ce60" formatted="false">"قليل يدوم كل يوم"</string>
     <string name="app_a_moment_of_remembrance_before_your_day_ou_d6e82e1c" formatted="false">"اذكر الله قبل أن تبدأ يومك خارج المنزل"</string>
+    <string name="app_a_path_through_your_day_fde8c699" formatted="false">"طريق يرافق\nيومك."</string>
+    <string name="app_about_4efca0d1" formatted="false">"حول التطبيق"</string>
+    <string name="app_accent_a5c6fb18" formatted="false">"اللون"</string>
     <string name="app_accent_color_baeefbad" formatted="false">"لون التمييز"</string>
+    <string name="app_add_one_156e294d" formatted="false">"أضف واحدة"</string>
     <string name="app_add_to_favorites_7f3c0782" formatted="false">"إضافة إلى المفضلة"</string>
     <string name="app_after_a_troubling_dream_b1527967" formatted="false">"بعد حلم مزعج"</string>
     <string name="app_after_prayer_azkar_2286e7f0" formatted="false">"أذكار بعد الصلاة"</string>
+    <string name="app_all_a52ace42" formatted="false">"الكل"</string>
     <string name="app_all_azkar_7a5e71d4" formatted="false">"جميع الأذكار"</string>
+    <string name="app_all_steps_done_for_today_3a19fc90" formatted="false">"أتممت كل الخطوات لهذا اليوم."</string>
     <string name="app_an_evening_pause_958196ef" formatted="false">"وقفة المساء"</string>
+    <string name="app_appearance_3907fa7f" formatted="false">"المظهر"</string>
     <string name="app_label_bafb66f3" formatted="false">"العربية"</string>
     <string name="app_as_the_day_settles_60024c40" formatted="false">"ختام يومك"</string>
     <string name="app_asr_bd7aa938" formatted="false">"العصر"</string>
     <string name="app_asr_calculation_e6ddae45" formatted="false">"حساب العصر"</string>
     <string name="app_asr_journey_06b553c6" formatted="false">"رحلة العصر"</string>
+    <string name="app_azkar_e35f6557" formatted="false">"الأذكار"</string>
     <string name="app_azkar_for_the_adhan_b5acd486" formatted="false">"أذكار الأذان"</string>
     <string name="app_azkar_reminders_4af7dc18" formatted="false">"تذكير الأذكار"</string>
     <string name="app_azkar_when_setting_out_270767b5" formatted="false">"ذكر الركوب عند الخروج"</string>
@@ -31,6 +47,7 @@
     <string name="app_blue_ec7d56a0" formatted="false">"أزرق"</string>
     <string name="app_brown_18f28559" formatted="false">"بني"</string>
     <string name="app_browse_azkar_9b4c7cbb" formatted="false">"تصفح الأذكار"</string>
+    <string name="app_calculation_025194fb" formatted="false">"طريقة الحساب"</string>
     <string name="app_calculation_method_00aa3cd0" formatted="false">"طريقة الحساب"</string>
     <string name="app_change_city_5a7bae12" formatted="false">"Change city"</string>
     <string name="app_choose_a_city_70db5eaa" formatted="false">"اختر مدينة"</string>
@@ -41,6 +58,8 @@
     <string name="app_choose_an_accent_color_change_language_in__adb40566" formatted="false">"اختر لون التمييز. يمكنك تغيير اللغة من إعدادات iOS."</string>
     <string name="app_choose_morning_and_evening_times_in_settin_c3b8a227" formatted="false">"اختر أوقات الصباح والمساء من الإعدادات."</string>
     <string name="app_choose_the_prayer_for_this_routine_3c6aa064" formatted="false">"اختر الصلاة لهذه الرحلة."</string>
+    <string name="app_city_fc33f732" formatted="false">"المدينة"</string>
+    <string name="app_city_coordinates_represent_the_city_centre_e27a82f9" formatted="false">"تمثل إحداثيات المدينة مركزها. يمكنك تغيير طريقة الحساب من الإعدادات › مواقيت الصلاة."</string>
     <string name="app_clear_location_c10be6b3" formatted="false">"مسح الموقع"</string>
     <string name="app_clear_search_3b7ea517" formatted="false">"مسح البحث"</string>
     <string name="app_close_7d9eb7ac" formatted="false">"إغلاق"</string>
@@ -56,8 +75,10 @@
     <string name="app_count_lld_c9e7e5e6" formatted="false">"العدد: %lld"</string>
     <string name="app_counter_a78cfdf4" formatted="false">"السبحة"</string>
     <string name="app_current_location_cf8c8078" formatted="false">"الموقع الحالي"</string>
+    <string name="app_daily_azkar_gently_paced_through_your_day_535fa23e" formatted="false">"أذكار يومك، موزّعة بهدوء على ساعاته."</string>
     <string name="app_daily_journeys_03cc0651" formatted="false">"الرحلات اليومية"</string>
     <string name="app_dark_60acc53f" formatted="false">"داكن"</string>
+    <string name="app_day_8f2364e1" formatted="false">"نهاري"</string>
     <string name="app_dhuhr_2cf8019a" formatted="false">"الظهر"</string>
     <string name="app_dhuhr_journey_7bb90661" formatted="false">"رحلة الظهر"</string>
     <string name="app_done_11a6767d" formatted="false">"تم"</string>
@@ -65,8 +86,10 @@
     <string name="app_dua_before_the_iqama_f0a6df27" formatted="false">"الدعاء بين الأذان والإقامة"</string>
     <string name="app_dubai_uae_655ebe71" formatted="false">"دبي، الإمارات العربية المتحدة"</string>
     <string name="app_duha_cdd19cdb" formatted="false">"الضحى"</string>
+    <string name="app_dusk_abd7160c" formatted="false">"غسق"</string>
     <string name="app_earned_today_74183778" formatted="false">"نقاط اليوم: "</string>
     <string name="app_egyptian_general_authority_of_survey_218abbbe" formatted="false">"الهيئة المصرية العامة للمساحة"</string>
+    <string name="app_ember_cb1655db" formatted="false">"جمر"</string>
     <string name="app_enable_location_services_and_try_again_a9b11088" formatted="false">"فعّل خدمات الموقع وحاول مجدداً."</string>
     <string name="app_enable_notifications_for_azkarify_in_ios_s_b08595c5" formatted="false">"فعّل إشعارات أذكاريفاي من إعدادات iOS."</string>
     <string name="app_enable_notifications_in_android_settings_t_6009ec2d" formatted="false">"فعّل الإشعارات في إعدادات أندرويد لاستخدام التذكيرات."</string>
@@ -78,11 +101,14 @@
     <string name="app_fajr_a239b920" formatted="false">"الفجر"</string>
     <string name="app_fajr_journey_7c8009ed" formatted="false">"رحلة الفجر"</string>
     <string name="app_favorites_7a1f2a83" formatted="false">"المفضلة"</string>
+    <string name="app_favourites_d97d51d3" formatted="false">"المفضلة"</string>
     <string name="app_find_a_zikr_by_topic_or_search_for_it_f7c910ea" formatted="false">"ابحث عن الذكر بحسب الموضوع أو بالبحث."</string>
     <string name="app_find_the_right_zikr_faster_c1efad7b" formatted="false">"ابحث عن الذكر المناسب"</string>
     <string name="app_find_ways_to_support_future_updates_in_set_3e82b8a9" formatted="false">"تجد طرق دعم التحديثات القادمة في الإعدادات."</string>
     <string name="app_finding_your_location_992f1d90" formatted="false">"جارٍ تحديد موقعك…"</string>
+    <string name="app_focus_mode_047cfdeb" formatted="false">"وضع التركيز"</string>
     <string name="app_follow_a_journey_at_your_own_pace_c804627d" formatted="false">"أكمل رحلتك على مهل."</string>
+    <string name="app_forest_eed88b3a" formatted="false">"غابة"</string>
     <string name="app_get_started_61e8d44a" formatted="false">"ابدأ"</string>
     <string name="app_go_to_the_mosque_d148a920" formatted="false">"الذهاب إلى المسجد ودخوله"</string>
     <string name="app_green_d486dfbd" formatted="false">"أخضر"</string>
@@ -92,6 +118,7 @@
     <string name="app_if_needed_before_wudu_eb923d79" formatted="false">"عند الحاجة قبل الوضوء."</string>
     <string name="app_if_you_are_riding_in_a_vehicle_96b53c16" formatted="false">"إذا كنت تركب وسيلة مواصلات."</string>
     <string name="app_if_you_wake_during_the_night_44b0503e" formatted="false">"إذا استيقظت أثناء الليل"</string>
+    <string name="app_incomplete_75f33cdf" formatted="false">"غير مكتملة"</string>
     <string name="app_isha_d48047e6" formatted="false">"العشاء"</string>
     <string name="app_isha_adjustment_minutes_d3068fff" formatted="false">"تعديل العشاء (بالدقائق)"</string>
     <string name="app_isha_journey_d815bb63" formatted="false">"رحلة العشاء"</string>
@@ -100,9 +127,11 @@
     <string name="app_keep_the_topics_you_return_to_close_at_han_835df40a" formatted="false">"احفظ المواضيع التي تعود إليها كثيرًا."</string>
     <string name="app_kuwait_10c3c2e2" formatted="false">"الكويت"</string>
     <string name="app_language_a4fe6526" formatted="false">"اللغة"</string>
+    <string name="app_larger_text_13b39463" formatted="false">"نص أكبر"</string>
     <string name="app_latitude_238a676d" formatted="false">"خط العرض"</string>
     <string name="app_leave_the_mosque_b226b101" formatted="false">"الخروج من المسجد"</string>
     <string name="app_leaving_home_azkar_b10e4172" formatted="false">"ذكر الخروج من المنزل"</string>
+    <string name="app_less_scrolling_more_soul_a932ad60" formatted="false">"تصفّح أقل. روح أكثر."</string>
     <string name="app_light_dbcd5e7b" formatted="false">"فاتح"</string>
     <string name="app_load_more_cities_560f32f3" formatted="false">"تحميل المزيد من المدن"</string>
     <string name="app_loading_azkar_e8ccb209" formatted="false">"جارٍ تحميل الأذكار"</string>
@@ -123,16 +152,20 @@
     <string name="app_moonsighting_committee_d6286a70" formatted="false">"لجنة رؤية الهلال"</string>
     <string name="app_morning_evening_e07136c2" formatted="false">"الصباح والمساء"</string>
     <string name="app_morning_azkar_4a26f836" formatted="false">"أذكار الصباح"</string>
+    <string name="app_morning_prayers_and_evening_one_step_at_a__5ca7a015" formatted="false">"الصباح والصلوات والمساء، خطوة بعد خطوة. يبدأ تقدّمك من جديد كل يوم."</string>
     <string name="app_muslim_world_league_1751d49a" formatted="false">"رابطة العالم الإسلامي"</string>
     <string name="app_next_1ff57a29" formatted="false">"التالي"</string>
     <string name="app_next_prayer_e7f498e8" formatted="false">"الصلاة القادمة"</string>
+    <string name="app_night_4e9f8db8" formatted="false">"ليلي"</string>
     <string name="app_no_azkar_found_802064ee" formatted="false">"لم يُعثر على أذكار"</string>
     <string name="app_no_favorites_yet_95c91385" formatted="false">"لا توجد مفضلة بعد"</string>
+    <string name="app_no_favourites_yet_5d382926" formatted="false">"لا توجد مفضلة بعد"</string>
     <string name="app_no_recent_location_enter_coordinates_or_tr_358648e0" formatted="false">"لا يوجد موقع حديث. أدخل الإحداثيات أو افتح الخرائط ثم حاول مجدداً."</string>
     <string name="app_no_results_a43619f3" formatted="false">"لا توجد نتائج"</string>
     <string name="app_no_support_offering_is_available_yet_ce89700b" formatted="false">"لا توجد باقة دعم متاحة حاليًا."</string>
     <string name="app_north_america_isna_36553c88" formatted="false">"أمريكا الشمالية، ISNA"</string>
     <string name="app_not_now_a0e63d7c" formatted="false">"ليس الآن"</string>
+    <string name="app_not_set_4895f731" formatted="false">"غير محدد"</string>
     <string name="app_notifications_are_disabled_b93ab3a6" formatted="false">"الإشعارات معطلة"</string>
     <string name="app_notifications_are_disabled_enable_them_in__c3a5df80" formatted="false">"الإشعارات معطلة. فعّلها من إعدادات iOS لاستخدام التذكيرات."</string>
     <string name="app_ok_565339bc" formatted="false">"حسنًا"</string>
@@ -141,10 +174,14 @@
     <string name="app_optional_59be7133" formatted="false">"اختيارية"</string>
     <string name="app_page_lld_of_lld_fa8514ac" formatted="false">"الصفحة %1$lld من %2$lld"</string>
     <string name="app_paywall_unavailable_3e5af59c" formatted="false">"صفحة الدعم غير متاحة"</string>
+    <string name="app_please_try_again_eea4fb33" formatted="false">"يرجى المحاولة مرة أخرى."</string>
+    <string name="app_points_earned_9c99c206" formatted="false">"النقاط المكتسبة"</string>
     <string name="app_popular_cities_are_available_offline_enter_9a3c493a" formatted="false">"تتوفر مدن شائعة دون اتصال بالإنترنت. أدخل الإحداثيات لمكان آخر."</string>
     <string name="app_pray_subh_or_duha_30ebb346" formatted="false">"صلاة الصبح أو الضحى"</string>
     <string name="app_pray_with_remembrance_56748d7c" formatted="false">"أذكار الصلاة"</string>
+    <string name="app_prayer_location_ddaef5b0" formatted="false">"موقع الصلاة"</string>
     <string name="app_prayer_times_1bd9b259" formatted="false">"مواقيت الصلاة"</string>
+    <string name="app_prayer_times_are_calculated_on_your_phone__7d1188cf" formatted="false">"تُحسب مواقيت الصلاة على هاتفك، ولا يُرفع موقعك أبدًا."</string>
     <string name="app_prayer_times_wherever_you_are_d13dff05" formatted="false">"مواقيت الصلاة أينما كنت"</string>
     <string name="app_prepare_pray_and_remember_bb06b5d6" formatted="false">"تهيأ للصلاة وأتمها بالذكر"</string>
     <string name="app_previous_a57b08a4" formatted="false">"السابق"</string>
@@ -152,16 +189,21 @@
     <string name="app_progress_unavailable_563b460c" formatted="false">"التقدم غير متاح"</string>
     <string name="app_qatar_55ccc501" formatted="false">"قطر"</string>
     <string name="app_quick_mode_6cd472b8" formatted="false">"الوضع السريع"</string>
+    <string name="app_read_and_count_0b6bbc33" formatted="false">"اقرأ وعُدّ"</string>
     <string name="app_read_and_reflect_b35657dd" formatted="false">"اقرأ وتدبر"</string>
+    <string name="app_read_count_return_34680336" formatted="false">"اقرأ، عُدّ،\nثم عُد."</string>
+    <string name="app_reading_463816d0" formatted="false">"القراءة"</string>
     <string name="app_reminder_unavailable_b73f3f61" formatted="false">"التذكير غير متاح"</string>
     <string name="app_reminders_7971dd75" formatted="false">"التذكيرات"</string>
     <string name="app_remove_from_favorites_18720329" formatted="false">"إزالة من المفضلة"</string>
+    <string name="app_remove_one_1d98e96c" formatted="false">"احذف واحدة"</string>
     <string name="app_reset_daee7606" formatted="false">"إعادة ضبط"</string>
     <string name="app_rest_with_remembrance_1fc9da21" formatted="false">"ختام يومك بالذكر"</string>
     <string name="app_retry_942087cc" formatted="false">"إعادة المحاولة"</string>
     <string name="app_saffron_6d763d18" formatted="false">"زعفراني"</string>
     <string name="app_save_1509f561" formatted="false">"حفظ"</string>
     <string name="app_save_favorites_d098be12" formatted="false">"احفظ المفضلة"</string>
+    <string name="app_save_location_311e149e" formatted="false">"حفظ الموقع"</string>
     <string name="app_saved_b5c120b3" formatted="false">"تم الحفظ"</string>
     <string name="app_search_azkar_b48bc61e" formatted="false">"ابحث في الأذكار"</string>
     <string name="app_search_cities_86800df7" formatted="false">"Search cities"</string>
@@ -174,29 +216,43 @@
     <string name="app_set_your_location_to_see_prayer_times_alon_f17f02de" formatted="false">"حدد موقعك لعرض مواقيت الصلاة مع رحلاتك اليومية."</string>
     <string name="app_settings_74a883a0" formatted="false">"الإعدادات"</string>
     <string name="app_shafi_maliki_hanbali_fe1ee8ff" formatted="false">"الشافعي والمالكي والحنبلي"</string>
+    <string name="app_shown_under_the_arabic_in_english_b768768c" formatted="false">"يظهر تحت النص العربي بالإنجليزية."</string>
     <string name="app_singapore_c96dd81d" formatted="false">"سنغافورة"</string>
     <string name="app_skip_28d03596" formatted="false">"تخطي"</string>
     <string name="app_slideshow_1d0c5be7" formatted="false">"عرض الشرائح"</string>
+    <string name="app_small_moments_deeper_connection_51b3063c" formatted="false">"لحظات صغيرة.\nصلة أعمق."</string>
     <string name="app_small_steps_from_morning_to_night_56824b27" formatted="false">"خطوات صغيرة، من الصباح إلى المساء"</string>
+    <string name="app_smaller_text_d13cae54" formatted="false">"نص أصغر"</string>
+    <string name="app_start_reading_79f19928" formatted="false">"ابدأ القراءة"</string>
     <string name="app_start_with_morning_evening_sleep_or_waking_6184fab1" formatted="false">"ابدأ بأذكار الصباح والمساء أو النوم والاستيقاظ."</string>
     <string name="app_subh_45a19dd0" formatted="false">"الصبح"</string>
     <string name="app_support_the_app_e85771f6" formatted="false">"ادعم التطبيق"</string>
     <string name="app_support_the_developer_4353e1c1" formatted="false">"ادعم المطور"</string>
     <string name="app_system_6725e7bb" formatted="false">"النظام"</string>
     <string name="app_take_a_moment_for_your_own_dua_c7e643fe" formatted="false">"خذ لحظة للدعاء بما تريد."</string>
+    <string name="app_tap_anywhere_on_the_circle_to_count_down_efc473ff" formatted="false">"اضغط في أي مكان على الدائرة للعد التنازلي."</string>
+    <string name="app_tap_anywhere_on_the_circle_to_count_c7df3008" formatted="false">"اضغط في أي مكان على الدائرة للعد."</string>
     <string name="app_tap_the_number_to_count_down_c27501b1" formatted="false">"اضغط على الرقم للعد التنازلي"</string>
     <string name="app_tap_the_number_to_count_up_4a90b7de" formatted="false">"اضغط على الرقم للعد التصاعدي"</string>
+    <string name="app_tap_the_star_on_any_zikr_to_keep_it_here_6ec8846f" formatted="false">"اضغط على النجمة بجانب أي ذكر لتحفظه هنا."</string>
+    <string name="app_tap_to_count_each_zikr_reminders_and_your__0d0327b0" formatted="false">"اضغط لعدّ كل ذكر. تبقى التذكيرات وتقدّمك على هذا الجهاز."</string>
     <string name="app_tap_to_count_or_count_down_repeated_azkar_6a4d7558" formatted="false">"اضغط للعد أو للعد التنازلي للأذكار المكررة."</string>
     <string name="app_teal_fa15a5c1" formatted="false">"فيروزي"</string>
+    <string name="app_terracotta_433d669d" formatted="false">"تيراكوتا"</string>
+    <string name="app_text_size_d68761cc" formatted="false">"حجم النص"</string>
     <string name="app_theme_efb52e71" formatted="false">"المظهر"</string>
     <string name="app_time_for_evening_azkar_0a06c53c" formatted="false">"حان وقت أذكار المساء"</string>
     <string name="app_time_for_morning_azkar_79111023" formatted="false">"حان وقت أذكار الصباح"</string>
     <string name="app_time_zone_b9fe1464" formatted="false">"المنطقة الزمنية"</string>
+    <string name="app_today_2b065c7c" formatted="false">"اليوم"</string>
     <string name="app_today_s_prayer_times_b4e94c5d" formatted="false">"مواقيت الصلاة اليوم"</string>
     <string name="app_today_s_progress_14ff52de" formatted="false">"إنجازك اليوم"</string>
+    <string name="app_transliteration_1b11d588" formatted="false">"النطق بالحروف اللاتينية"</string>
+    <string name="app_try_another_word_8d9d7caa" formatted="false">"جرّب كلمة أخرى."</string>
     <string name="app_turkey_diyanet_approximation_dcc89255" formatted="false">"تركيا، تقريب لطريقة ديانت"</string>
     <string name="app_umm_al_qura_makkah_640e3a1a" formatted="false">"جامعة أم القرى، مكة"</string>
     <string name="app_university_of_islamic_sciences_karachi_c28e7aec" formatted="false">"جامعة العلوم الإسلامية، كراتشي"</string>
+    <string name="app_up_next_e31da5b2" formatted="false">"التالي"</string>
     <string name="app_upon_waking_a8378091" formatted="false">"عند الاستيقاظ"</string>
     <string name="app_use_current_location_9833e6ac" formatted="false">"استخدم الموقع الحالي"</string>
     <string name="app_use_the_counter_e4304b9e" formatted="false">"استخدم السبحة"</string>
@@ -204,14 +260,19 @@
     <string name="app_visit_the_restroom_65663b2f" formatted="false">"دخول الخلاء والخروج منه"</string>
     <string name="app_wake_up_05802f4e" formatted="false">"الاستيقاظ"</string>
     <string name="app_wake_prepare_and_begin_with_remembrance_00ca2d35" formatted="false">"استيقظ وتوضأ وابدأ يومك بالذكر"</string>
+    <string name="app_welcome_to_azkarify_b431ad91" formatted="false">"مرحبًا بك في أذكاري"</string>
     <string name="app_when_praying_at_the_mosque_77e781ba" formatted="false">"عند الصلاة في المسجد."</string>
     <string name="app_your_daily_journeys_5f2a42ce" formatted="false">"رحلاتك اليومية"</string>
+    <string name="app_your_place_is_kept_while_you_read_acfd6982" formatted="false">"يبقى مكانك محفوظًا أثناء القراءة."</string>
     <string name="app_your_points_bb5ad1f5" formatted="false">"نقاطك"</string>
     <string name="app_your_prayer_journeys_5fba6b67" formatted="false">"رحلات الصلاة"</string>
     <string name="app_your_progress_433a720b" formatted="false">"تقدمك"</string>
+    <string name="app_your_progress_stays_on_this_device_31901b46" formatted="false">"يبقى تقدمك على هذا الجهاز."</string>
     <string name="app_zikr_lld_of_lld_a94406b1" formatted="false">"الذكر %1$lld من %2$lld"</string>
     <string name="app_zikr_added_to_favourites_43619592" formatted="false">"أُضيف الذكر إلى المفضلة"</string>
+    <string name="app_of_today_s_journeys_complete_53b46d69" formatted="false">"من رحلات اليوم مكتملة"</string>
     <string name="app_of_your_day_complete_c1e3754c" formatted="false">"من يومك مكتمل"</string>
+    <string name="app_or_choose_a_city_9db4d08f" formatted="false">"أو اختر مدينة"</string>
     <string name="app_label_24568003" formatted="false">"ابحث عن مدينة"</string>
     <string name="app_label_6f317d9c" formatted="false">"ابحث عن منطقة زمنية"</string>
     <string name="app_label_f5bfc23e" formatted="false">"ابدأ رحلتك"</string>

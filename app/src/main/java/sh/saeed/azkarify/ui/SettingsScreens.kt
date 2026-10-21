@@ -13,13 +13,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -41,77 +46,168 @@ import java.util.Date
 import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.launch
+import sh.saeed.azkarify.ui.components.*
+import sh.saeed.azkarify.ui.theme.Az
+import sh.saeed.azkarify.ui.theme.AzAccent
+import sh.saeed.azkarify.ui.theme.AzRadius
+import sh.saeed.azkarify.ui.theme.AzSpace
+
+/** A titled group on a settings screen: `eyebrow` label, then the rows. */
+@Composable
+internal fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(AzSpace.xs)) {
+        AzEyebrow(title, Modifier.padding(horizontal = AzSpace.md), color = Az.colors.inkMuted)
+        AzListGroup(content = content)
+    }
+}
+
+internal fun accentName(accent: AzAccent, state: AppState) =
+    when (accent) {
+        AzAccent.Terracotta -> state.text("Terracotta")
+        AzAccent.Ember -> state.text("Ember")
+        AzAccent.Teal -> state.text("Teal")
+        AzAccent.Dusk -> state.text("Dusk")
+        AzAccent.Forest -> state.text("Forest")
+    }
 
 @Composable
-fun SettingsScreen(state: AppState, model: AppViewModel, go: (Destination) -> Unit) {
-    val p = LocalPalette.current
+fun SettingsScreen(
+    state: AppState,
+    model: AppViewModel,
+    onPrayerTimes: () -> Unit,
+    onLocation: () -> Unit,
+    onIntro: () -> Unit,
+) {
+    val colors = Az.colors
     val uriHandler = LocalUriHandler.current
-    var accentPicker by remember { mutableStateOf(false) }
-    var intro by remember { mutableStateOf(false) }
     var offering by remember { mutableStateOf<Offering?>(null) }
     var paywallError by remember { mutableStateOf<String?>(null) }
     var loadingPaywall by remember { mutableStateOf(false) }
+    var languageMenu by remember { mutableStateOf(false) }
+    val accent = AzAccent.of(state.accent)
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .statusBarsPadding()
+            .padding(horizontal = AzSpace.md)
+            .padding(top = AzSpace.md, bottom = AzSpace.xxl),
+        verticalArrangement = Arrangement.spacedBy(AzSpace.lg),
     ) {
-        SettingsGroup {
-            ChoiceRow(
-                state.text("Theme"),
-                state.theme,
-                listOf(
-                    "system" to state.text("System"),
-                    "light" to state.text("Light"),
-                    "dark" to state.text("Dark"),
-                ),
-                inlineValue = true,
-                change = model::setTheme,
-            )
-            HorizontalDivider(color = p.secondary.copy(alpha = .15f))
-            ChoiceRow(
-                state.text("Language"),
-                state.language,
-                listOf("en" to state.text("English"), "ar" to state.text("Arabic")),
-                inlineValue = true,
-                change = model::setLanguage,
-            )
-            HorizontalDivider(color = p.secondary.copy(alpha = .15f))
-            Row(
-                Modifier.fillMaxWidth()
-                    .heightIn(min = 54.dp)
-                    .clickable { accentPicker = true }
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
+        Text(
+            state.text("Settings"),
+            Modifier.padding(horizontal = AzSpace.xxs).semantics { heading() },
+            style = Az.type.title1,
+            color = colors.ink,
+        )
+        SettingsSection(state.text("Appearance")) {
+            Column(Modifier.padding(AzSpace.md), verticalArrangement = Arrangement.spacedBy(AzSpace.sm)) {
+                Text(state.text("Theme"), style = Az.type.rowTitle, color = colors.ink)
+                AzSegmented(
+                    listOf(
+                        "system" to state.text("System"),
+                        "light" to state.text("Day"),
+                        "dark" to state.text("Night"),
+                    ),
+                    state.theme,
+                    model::setTheme,
+                )
+            }
+            Column(
+                Modifier.dividerAbove(colors.line).padding(AzSpace.md),
+                verticalArrangement = Arrangement.spacedBy(AzSpace.sm),
             ) {
-                Text(state.text("Accent color"), Modifier.weight(1f), fontSize = 17.sp)
-                Box(Modifier.size(22.dp).background(p.accent, CircleShape))
+                Row {
+                    Text(state.text("Accent"), Modifier.weight(1f), style = Az.type.rowTitle, color = colors.ink)
+                    Text(accentName(accent, state), style = Az.type.callout, color = colors.inkMuted)
+                }
+                AzSwatchRow(
+                    AzAccent.entries.map { AzSwatch(it, accentName(it, state)) },
+                    accent,
+                    { model.setAccent(it.id) },
+                )
+            }
+            Box {
+                AzListRow(
+                    state.text("Language"),
+                    onClick = { languageMenu = true },
+                    subtitle = if (state.language == "ar") "العربية" else "English",
+                    divider = true,
+                    trailing = { AzIcon(AzSymbol.expand, null, tint = colors.inkSubtle) },
+                )
+                AppDropdownMenu(expanded = languageMenu, onDismissRequest = { languageMenu = false }) {
+                    listOf("en" to "English", "ar" to "العربية").forEach { (id, title) ->
+                        AppDropdownMenuItem(
+                            text = { Text(title) },
+                            selected = id == state.language,
+                            onClick = {
+                                languageMenu = false
+                                model.setLanguage(id)
+                            },
+                        )
+                    }
+                }
             }
         }
-        Text(state.text("Reminders"), fontSize = 14.sp, color = p.secondary)
-        SettingsGroup {
+        SettingsSection(state.text("Reading")) {
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = AzSpace.md, vertical = AzSpace.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(state.text("Text size"), Modifier.weight(1f), style = Az.type.rowTitle, color = colors.ink)
+                AzReaderSizeControl(
+                    state.readerScale,
+                    model::setReaderScale,
+                    state.text("Smaller text"),
+                    state.text("Larger text"),
+                )
+            }
+            AzListRow(
+                state.text("Transliteration"),
+                Modifier.toggleable(state.transliteration, role = Role.Switch, onValueChange = model::setTransliteration),
+                subtitle = state.text("Shown under the Arabic in English."),
+                divider = true,
+                trailing = { AzSwitch(state.transliteration, null) },
+            )
+        }
+        SettingsSection(state.text("Prayer times")) {
+            AzListRow(
+                state.text("Location"),
+                onClick = onLocation,
+                subtitle = state.prayerConfiguration?.displayLocationName(state.language) ?: state.text("Not set"),
+                leading = { AzIconWell(AzSymbol.location, small = true) },
+                inset = 64.dp,
+                trailing = { AzChevron() },
+            )
+            AzListRow(
+                state.text("Calculation method"),
+                onClick = onPrayerTimes,
+                subtitle =
+                    state.prayerConfiguration?.let { config ->
+                        prayerMethods.firstOrNull { it.first == config.method }?.let { state.text(it.second) }
+                    } ?: state.text("Muslim World League"),
+                divider = true,
+                inset = 64.dp,
+                leading = { AzIconWell(AzSymbol.schedule, small = true) },
+                trailing = { AzChevron() },
+            )
+        }
+        SettingsSection(state.text("Reminders")) {
             ReminderRow("morning", state, model)
-            HorizontalDivider(color = p.secondary.copy(alpha = .15f))
-            ReminderRow("evening", state, model)
+            ReminderRow("evening", state, model, divider = true)
         }
-        Text(state.text("Daily journeys"), fontSize = 14.sp, color = p.secondary)
-        SettingsGroup {
-            Text(
-                state.text("Prayer times"),
-                Modifier.fillMaxWidth().clickable { go(Destination.Prayer) }.padding(16.dp),
-                fontSize = 17.sp,
-                color = p.accent,
-            )
-        }
-        SettingsGroup {
-            Text(
+        SettingsSection(state.text("About")) {
+            AzListRow(
                 state.text("View introduction"),
-                Modifier.fillMaxWidth().clickable { intro = true }.padding(16.dp),
-                fontSize = 17.sp,
-                color = p.accent,
+                onClick = onIntro,
+                leading = { AzIconWell(AzSymbol.info, small = true) },
+                inset = 64.dp,
+                trailing = { AzChevron() },
             )
-            HorizontalDivider(color = p.secondary.copy(alpha = .15f))
-            TextButton(
+            AzListRow(
+                state.text("Support the developer"),
                 onClick = {
+                    if (!RevenueCatService.isConfigured || loadingPaywall) return@AzListRow
                     loadingPaywall = true
                     Purchases.sharedInstance.getOfferings(
                         object : ReceiveOfferingsCallback {
@@ -124,34 +220,33 @@ fun SettingsScreen(state: AppState, model: AppViewModel, go: (Destination) -> Un
                                 loadingPaywall = false
                                 val current = offerings.current
                                 if (current == null)
-                                    paywallError =
-                                        state.text("No support offering is available yet.")
+                                    paywallError = state.text("No support offering is available yet.")
                                 else offering = current
                             }
                         }
                     )
                 },
-                enabled = RevenueCatService.isConfigured && !loadingPaywall,
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
-            ) {
-                Text(
-                    state.text("Support the developer"),
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = 17.sp,
-                )
-            }
-        }
-        SettingsGroup {
-            TextButton(
+                divider = true,
+                inset = 64.dp,
+                leading = { AzIconWell(AzSymbol.favorite, small = true) },
+                trailing = { AzChevron() },
+            )
+            AzListRow(
+                state.text("Privacy policy"),
                 onClick = { uriHandler.openUri("https://azkarify.saeed.sh/android/policy") },
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
-            ) {
+                divider = true,
+                inset = 64.dp,
+                leading = { AzIconWell(AzSymbol.privacy, small = true) },
+                trailing = { AzChevron() },
+            )
+        }
+        AzCard(tone = AzTone.Forest, compact = true) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AzSpace.sm)) {
+                AzOrnament(AzOrnamentShape.Sparkle, colors.onForest, size = 22.dp)
                 Text(
-                    state.text("Privacy policy"),
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = 17.sp,
+                    state.text("Your progress stays on this device."),
+                    style = Az.type.callout,
+                    color = colors.onForest,
                 )
             }
         }
@@ -175,93 +270,29 @@ fun SettingsScreen(state: AppState, model: AppViewModel, go: (Destination) -> Un
             },
         )
     }
-    if (accentPicker)
-        ModalBottomSheet(
-            onDismissRequest = { accentPicker = false },
-            containerColor = p.background,
-        ) {
-            Column(Modifier.padding(20.dp)) {
-                Text(state.text("Accent color"), fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                listOf(
-                        "brown" to "Brown",
-                        "saffron" to "Saffron",
-                        "teal" to "Teal",
-                        "blue" to "Blue",
-                        "green" to "Green",
-                    )
-                    .forEach { (id, title) ->
-                        Row(
-                            Modifier.fillMaxWidth().heightIn(min = 54.dp).clickable {
-                                model.setAccent(id)
-                                accentPicker = false
-                            },
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Box(
-                                Modifier.size(24.dp)
-                                    .background(palette(id, p.dark).accent, CircleShape)
-                            )
-                            Text(
-                                state.text(title),
-                                Modifier.padding(start = 12.dp).weight(1f),
-                                fontSize = 17.sp,
-                            )
-                            if (state.accent == id) Text("✓", color = p.accent, fontSize = 22.sp)
-                        }
-                    }
-            }
-        }
-    if (intro)
-        androidx.compose.ui.window.Dialog(
-            onDismissRequest = { intro = false },
-            properties =
-                androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
-        ) {
-            Surface(color = p.background, modifier = Modifier.fillMaxSize()) {
-                IntroScreen(state) { intro = false }
-            }
-        }
 }
 
-@Composable
-fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
-    AppCard(content = content)
-}
+/** Hairline above a block inside a list group. */
+internal fun Modifier.dividerAbove(color: androidx.compose.ui.graphics.Color) =
+    drawBehind { drawLine(color, Offset.Zero, Offset(size.width, 0f), 1.dp.toPx()) }
 
 @Composable
 fun ChoiceRow(
     label: String,
     value: String,
     options: List<Pair<String, String>>,
-    inlineValue: Boolean = false,
+    divider: Boolean = false,
     change: (String) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
-        ListItem(
+        AzListRow(
+            label,
             onClick = { expanded = true },
-            supportingContent =
-                if (inlineValue) null
-                else ({ Text(options.firstOrNull { it.first == value }?.second ?: value) }),
-            trailingContent = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    if (inlineValue) {
-                        Text(
-                            options.firstOrNull { it.first == value }?.second ?: value,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = LocalPalette.current.secondary,
-                        )
-                    }
-                    Icon(Icons.Outlined.ArrowDropDown, null)
-                }
-            },
-            colors = ListItemDefaults.colors(containerColor = LocalPalette.current.background),
-        ) {
-            Text(label)
-        }
+            subtitle = options.firstOrNull { it.first == value }?.second ?: value,
+            divider = divider,
+            trailing = { AzIcon(AzSymbol.expand, null, tint = Az.colors.inkSubtle) },
+        )
         AppDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             options.forEach { (id, title) ->
                 AppDropdownMenuItem(
@@ -277,135 +308,47 @@ fun ChoiceRow(
     }
 }
 
+/** Settings › Prayer times: location, calculation method, madhab and manual coordinates. */
 @Composable
-private fun ReminderRow(kind: String, state: AppState, model: AppViewModel) {
-    val context = LocalContext.current
-    val prefs = model.preferences
-    var enabled by remember { mutableStateOf(prefs.getBoolean("reminder.$kind.enabled", false)) }
-    var hour by remember {
-        mutableIntStateOf(prefs.getInt("reminder.$kind.hour", if (kind == "morning") 8 else 18))
-    }
-    var minute by remember { mutableIntStateOf(prefs.getInt("reminder.$kind.minute", 0)) }
-    var denied by remember { mutableStateOf(false) }
-    var showTimePicker by rememberSaveable { mutableStateOf(false) }
-    fun set(value: Boolean) {
-        enabled = value
-        prefs.edit { putBoolean("reminder.$kind.enabled", value) }
-        Reminders.schedule(context, kind)
-    }
-    val permission =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { allowed ->
-            if (allowed) set(true) else denied = true
-        }
-    Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .heightIn(min = 64.dp)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Text(
-            state.text(if (kind == "morning") "🌅 Morning reminder" else "🌙 Evening reminder"),
-            Modifier.weight(1f),
-            fontSize = 17.sp,
-        )
-        AssistChip(
-            onClick = { showTimePicker = true },
-            label = {
-                Text(
-                    String.format(Locale.forLanguageTag(state.language), "%02d:%02d", hour, minute)
-                )
-            },
-        )
-        Switch(
-            enabled,
-            onCheckedChange = { value ->
-                if (!value) set(false)
-                else if (Reminders.allowed(context)) set(true)
-                else if (Build.VERSION.SDK_INT >= 33)
-                    permission.launch(Manifest.permission.POST_NOTIFICATIONS)
-                else denied = true
-            },
-        )
-    }
-    if (showTimePicker) {
-        val picker =
-            rememberTimePickerState(
-                hour,
-                minute,
-                android.text.format.DateFormat.is24HourFormat(context),
+fun PrayerSettingsScreen(state: AppState, model: AppViewModel, onBack: () -> Unit) {
+    Scaffold(
+        containerColor = Az.colors.paper,
+        topBar = {
+            TopAppBar(
+                title = { Text(state.text("Prayer times"), style = Az.type.headline) },
+                navigationIcon = { AzIconButton(AzSymbol.back, state.text("Back"), onBack) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Az.colors.paper, titleContentColor = Az.colors.ink),
             )
-        val compactHeight = LocalConfiguration.current.screenHeightDp < 400
-        var inputMode by rememberSaveable { mutableStateOf(compactHeight) }
-        val displayMode =
-            if (inputMode || compactHeight) TimePickerDisplayMode.Input
-            else TimePickerDisplayMode.Picker
-        TimePickerDialog(
-            onDismissRequest = { showTimePicker = false },
-            title = { TimePickerDialogDefaults.Title(displayMode) },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        hour = picker.hour
-                        minute = picker.minute
-                        prefs.edit {
-                            putInt("reminder.$kind.hour", hour)
-                                .putInt("reminder.$kind.minute", minute)
-                        }
-                        Reminders.schedule(context, kind)
-                        showTimePicker = false
-                    },
-                    shapes = ButtonDefaults.shapes(),
-                ) {
-                    Text(state.text("Save"))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showTimePicker = false }) { Text(state.text("Close")) }
-            },
-            modeToggleButton =
-                if (compactHeight) null
-                else
-                    ({
-                        TimePickerDialogDefaults.DisplayModeToggle(
-                            onDisplayModeChange = { inputMode = !inputMode },
-                            displayMode = displayMode,
-                        )
-                    }),
-        ) {
-            if (displayMode == TimePickerDisplayMode.Input) TimeInput(picker)
-            else TimePicker(picker)
-        }
+        },
+    ) { insets ->
+        PrayerLocationForm(state, model, compact = false, Modifier.padding(insets))
     }
-    if (denied)
-        AlertDialog(
-            onDismissRequest = { denied = false },
-            title = { Text(state.text("Notifications are disabled")) },
-            text = {
-                Text(state.text("Enable notifications in Android Settings to use reminders."))
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        denied = false
-                        context.startActivity(
-                            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                                .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                        )
-                    }
-                ) {
-                    Text(state.text("Settings"))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { denied = false }) { Text(state.text("Close")) }
-            },
-        )
+}
+
+/** The prayer location sheet: device location or a city, saved on this device only. */
+@Composable
+fun PrayerLocationSheet(state: AppState, model: AppViewModel, onDismiss: () -> Unit) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberBottomSheetState(SheetValue.Hidden, enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)),
+        containerColor = Az.colors.paper,
+    ) {
+        Row(Modifier.padding(horizontal = AzSpace.gutter), verticalAlignment = Alignment.CenterVertically) {
+            Text(state.text("Prayer location"), Modifier.weight(1f), style = Az.type.title2, color = Az.colors.ink)
+            AzIconButton(AzSymbol.close, state.text("Close"), onDismiss, variant = AzIconButtonVariant.Filled)
+        }
+        PrayerLocationForm(state, model, compact = true, onSaved = onDismiss)
+    }
 }
 
 @Composable
-fun PrayerSettingsScreen(state: AppState, model: AppViewModel) {
+private fun PrayerLocationForm(
+    state: AppState,
+    model: AppViewModel,
+    compact: Boolean,
+    modifier: Modifier = Modifier,
+    onSaved: () -> Unit = {},
+) {
     val config = state.prayerConfiguration
     var name by rememberSaveable { mutableStateOf(config?.locationName ?: "") }
     var lat by rememberSaveable { mutableStateOf(config?.latitude?.toString() ?: "") }
@@ -539,145 +482,175 @@ fun PrayerSettingsScreen(state: AppState, model: AppViewModel) {
                 }
             }
         }
-    val p = LocalPalette.current
-    Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        TextButton(onClick = { showCityPicker = true }) {
-            Text(state.text("Choose a city"))
+    val colors = Az.colors
+    fun save() {
+        draft?.takeIf { it.isValid }?.let {
+            model.savePrayer(it)
+            saved = true
+            error = null
+            onSaved()
         }
-        TextButton(
-            onClick = {
+    }
+    val fieldColors =
+        OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = colors.paperRaised,
+            unfocusedContainerColor = colors.paperRaised,
+            focusedBorderColor = colors.accent,
+            unfocusedBorderColor = colors.lineStrong,
+            focusedLabelColor = colors.accent,
+            cursorColor = colors.accent,
+        )
+    @Composable
+    fun Field(value: String, label: String, onChange: (String) -> Unit, hint: String? = null) =
+        OutlinedTextField(
+            value,
+            {
+                onChange(it)
+                saved = false
+            },
+            label = { Text(label) },
+            supportingText = hint?.let { { Text(it) } },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            shape = RoundedCornerShape(AzRadius.sm),
+            colors = fieldColors,
+        )
+    Column(
+        modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = AzSpace.gutter)
+            .padding(top = AzSpace.md, bottom = AzSpace.xxl)
+            .imePadding(),
+        verticalArrangement = Arrangement.spacedBy(AzSpace.lg),
+    ) {
+        AzCard(tone = AzTone.Sage, compact = true) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                AzIcon(AzSymbol.privacy, null, tint = colors.inkSoft)
+                Text(
+                    state.text("Prayer times are calculated on your phone. Your location is never uploaded."),
+                    style = Az.type.callout,
+                    color = colors.inkSoft,
+                )
+            }
+        }
+        AzButton(
+            state.text(if (locating) "Finding your location…" else "Use current location"),
+            {
                 permission.launch(
-                    arrayOf(
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                    )
+                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
                 )
             },
+            Modifier.fillMaxWidth(),
             enabled = !locating,
-        ) {
-            Text(state.text(if (locating) "Finding your location…" else "Use current location"))
+            leading = AzSymbol.myLocation,
+        )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AzSpace.sm)) {
+            HorizontalDivider(Modifier.weight(1f), color = colors.line)
+            Text(state.text("or choose a city"), style = Az.type.footnote, color = colors.inkMuted)
+            HorizontalDivider(Modifier.weight(1f), color = colors.line)
         }
-        Text(state.text("Location"), fontSize = 14.sp, color = p.secondary)
-        OutlinedTextField(
-            name,
-            {
-                name = it
-                saved = false
-            },
-            label = { Text(state.text("Location name")) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-        )
-        OutlinedTextField(
-            lat,
-            {
-                lat = it
-                saved = false
-            },
-            label = { Text(state.text("Latitude")) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-        )
-        OutlinedTextField(
-            lon,
-            {
-                lon = it
-                saved = false
-            },
-            label = { Text(state.text("Longitude")) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-        )
-        // The zone is explicit because location alone does not determine a timezone.
-        OutlinedTextField(
-            zone,
-            {
-                zone = it
-                saved = false
-            },
-            label = { Text(state.text("Time zone")) },
-            supportingText = { Text("Asia/Dubai · Africa/Cairo · Europe/London") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-        )
-        SettingsGroup {
-            ChoiceRow(
-                state.text("Calculation method"),
-                method,
-                prayerMethods.map { it.first to state.text(it.second) },
-            ) {
-                method = it
-                saved = false
-            }
-            ChoiceRow(
-                state.text("Asr calculation"),
-                if (hanafi) "hanafi" else "shafi",
-                listOf(
-                    "shafi" to state.text("Shafi, Maliki, Hanbali"),
-                    "hanafi" to state.text("Hanafi, later Asr"),
-                ),
-            ) {
-                hanafi = it == "hanafi"
-                saved = false
-            }
+        AzListGroup {
+            AzListRow(
+                matchedCity?.displayName(state.language) ?: name.ifBlank { state.text("Choose a city") },
+                onClick = { showCityPicker = true },
+                subtitle = state.text("City"),
+                subtitleFirst = true,
+                selected = matchedCity != null,
+                inset = 64.dp,
+                leading = {
+                    AzIconWell(
+                        AzSymbol.location,
+                        small = true,
+                        state = if (matchedCity != null) AzWellState.On else AzWellState.Idle,
+                    )
+                },
+                trailing = { AzChevron() },
+            )
         }
-        OutlinedTextField(
-            adjustment,
-            {
-                adjustment = it
-                saved = false
+        if (!compact) {
+            SettingsSection(state.text("Calculation")) {
+                ChoiceRow(
+                    state.text("Calculation method"),
+                    method,
+                    prayerMethods.map { it.first to state.text(it.second) },
+                ) {
+                    method = it
+                    saved = false
+                }
+                ChoiceRow(
+                    state.text("Asr calculation"),
+                    if (hanafi) "hanafi" else "shafi",
+                    listOf(
+                        "shafi" to state.text("Shafi, Maliki, Hanbali"),
+                        "hanafi" to state.text("Hanafi, later Asr"),
+                    ),
+                    divider = true,
+                ) {
+                    hanafi = it == "hanafi"
+                    saved = false
+                }
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(AzSpace.xs)) {
+                AzEyebrow(state.text("Location"), Modifier.padding(horizontal = AzSpace.md), color = colors.inkMuted)
+                Field(name, state.text("Location name"), { name = it })
+                Field(lat, state.text("Latitude"), { lat = it })
+                Field(lon, state.text("Longitude"), { lon = it })
+                // The zone is explicit because location alone does not determine a timezone.
+                Field(zone, state.text("Time zone"), { zone = it }, "Asia/Dubai · Africa/Cairo · Europe/London")
+                Field(adjustment, state.text("Isha adjustment (minutes)"), { adjustment = it }, "−60 … +60")
+            }
+        } else {
+            Text(
+                state.text("City coordinates represent the city centre. You can change the calculation method in Settings › Prayer times."),
+                Modifier.padding(horizontal = AzSpace.xxs),
+                style = Az.type.footnote,
+                color = colors.inkMuted,
+            )
+        }
+        error?.let { Text(it, style = Az.type.callout, color = MaterialTheme.colorScheme.error) }
+        AzButton(
+            when {
+                saved -> state.text("Saved")
+                compact -> state.text("Save location")
+                else -> state.text("Save")
             },
-            label = { Text(state.text("Isha adjustment (minutes)")) },
-            supportingText = { Text("−60 … +60") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Button(
-            shapes = ButtonDefaults.shapes(),
-            onClick = {
-                draft
-                    ?.takeIf { it.isValid }
-                    ?.let {
-                        model.savePrayer(it)
-                        saved = true
-                        error = null
-                    }
-            },
+            ::save,
+            Modifier.fillMaxWidth(),
+            AzButtonVariant.Accent,
             enabled = draft?.isValid == true,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(state.text(if (saved) "Saved" else "Save"))
-        }
-        if (draft?.isValid != true)
+        )
+        if (draft?.isValid != true && !compact)
             Text(
                 state.text("Enter a name, valid coordinates, time zone, and adjustment to save."),
-                fontSize = 13.sp,
-                color = p.secondary,
+                style = Az.type.footnote,
+                color = colors.inkMuted,
             )
-        error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-        if (config != null) {
-            Text(state.text("Today's prayer times"), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        if (config != null && !compact) {
             val times = remember(config) { PrayerSchedule.calculate(config, Date()) }
-            times.forEach { prayer ->
-                Row(Modifier.fillMaxWidth()) {
-                    Text(prayerTitle(prayer.id, state), Modifier.weight(1f))
-                    Text(
-                        PrayerSchedule.format(prayer.time, config, state.language),
-                        color = p.accent,
+            SettingsSection(state.text("Today's prayer times")) {
+                times.forEachIndexed { index, prayer ->
+                    AzListRow(
+                        prayerTitle(prayer.id, state),
+                        divider = index > 0,
+                        trailing = {
+                            Text(
+                                PrayerSchedule.format(prayer.time, config, state.language),
+                                style = Az.type.headline.copy(fontFeatureSettings = "tnum"),
+                                color = colors.ink,
+                            )
+                        },
                     )
                 }
             }
-            TextButton(
-                onClick = {
+            AzButton(
+                state.text("Clear location"),
+                {
                     model.clearPrayer()
                     saved = false
-                }
-            ) {
-                Text(state.text("Clear location"))
-            }
+                },
+                variant = AzButtonVariant.Text,
+            )
         }
     }
     if (showCityPicker)
@@ -707,3 +680,133 @@ private fun prayerTitle(id: String, state: AppState) =
         "maghrib" -> state.text("Maghrib")
         else -> state.text("Isha")
     }
+
+@Composable
+private fun ReminderRow(kind: String, state: AppState, model: AppViewModel, divider: Boolean = false) {
+    val context = LocalContext.current
+    val prefs = model.preferences
+    var enabled by remember { mutableStateOf(prefs.getBoolean("reminder.$kind.enabled", false)) }
+    var hour by remember {
+        mutableIntStateOf(prefs.getInt("reminder.$kind.hour", if (kind == "morning") 8 else 18))
+    }
+    var minute by remember { mutableIntStateOf(prefs.getInt("reminder.$kind.minute", 0)) }
+    var denied by remember { mutableStateOf(false) }
+    var showTimePicker by rememberSaveable { mutableStateOf(false) }
+    fun set(value: Boolean) {
+        enabled = value
+        prefs.edit { putBoolean("reminder.$kind.enabled", value) }
+        Reminders.schedule(context, kind)
+    }
+    val permission =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { allowed ->
+            if (allowed) set(true) else denied = true
+        }
+    val colors = Az.colors
+    AzListRow(
+        state.text(if (kind == "morning") "Morning azkar" else "Evening azkar"),
+        divider = divider,
+        inset = 64.dp,
+        leading = { AzIconWell(if (kind == "morning") AzSymbol.sunrise else AzSymbol.night, small = true) },
+        trailing = {
+            AssistChip(
+                onClick = { showTimePicker = true },
+                label = {
+                    Text(
+                        String.format(Locale.forLanguageTag(state.language), "%02d:%02d", hour, minute),
+                        style = Az.type.callout.copy(fontFeatureSettings = "tnum"),
+                    )
+                },
+                shape = RoundedCornerShape(AzRadius.xs + 2.dp),
+                colors =
+                    AssistChipDefaults.assistChipColors(
+                        containerColor = colors.paperRaised,
+                        labelColor = if (enabled) colors.ink else colors.inkMuted,
+                    ),
+                border = BorderStroke(1.dp, colors.lineStrong),
+            )
+            AzSwitch(
+                enabled,
+                { value ->
+                    if (!value) set(false)
+                    else if (Reminders.allowed(context)) set(true)
+                    else if (Build.VERSION.SDK_INT >= 33)
+                        permission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    else denied = true
+                },
+            )
+        },
+    )
+    if (showTimePicker) {
+        val picker =
+            rememberTimePickerState(
+                hour,
+                minute,
+                android.text.format.DateFormat.is24HourFormat(context),
+            )
+        val compactHeight = LocalConfiguration.current.screenHeightDp < 400
+        var inputMode by rememberSaveable { mutableStateOf(compactHeight) }
+        val displayMode =
+            if (inputMode || compactHeight) TimePickerDisplayMode.Input
+            else TimePickerDisplayMode.Picker
+        TimePickerDialog(
+            onDismissRequest = { showTimePicker = false },
+            title = { TimePickerDialogDefaults.Title(displayMode) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        hour = picker.hour
+                        minute = picker.minute
+                        prefs.edit {
+                            putInt("reminder.$kind.hour", hour)
+                                .putInt("reminder.$kind.minute", minute)
+                        }
+                        Reminders.schedule(context, kind)
+                        showTimePicker = false
+                    },
+                    shapes = ButtonDefaults.shapes(),
+                ) {
+                    Text(state.text("Save"))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) { Text(state.text("Close")) }
+            },
+            modeToggleButton =
+                if (compactHeight) null
+                else
+                    ({
+                        TimePickerDialogDefaults.DisplayModeToggle(
+                            onDisplayModeChange = { inputMode = !inputMode },
+                            displayMode = displayMode,
+                        )
+                    }),
+        ) {
+            if (displayMode == TimePickerDisplayMode.Input) TimeInput(picker)
+            else TimePicker(picker)
+        }
+    }
+    if (denied)
+        AlertDialog(
+            onDismissRequest = { denied = false },
+            title = { Text(state.text("Notifications are disabled")) },
+            text = {
+                Text(state.text("Enable notifications in Android Settings to use reminders."))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        denied = false
+                        context.startActivity(
+                            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                        )
+                    }
+                ) {
+                    Text(state.text("Settings"))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { denied = false }) { Text(state.text("Close")) }
+            },
+        )
+}

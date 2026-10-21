@@ -53,6 +53,11 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
     }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+        // Robolectric reaches into FileDescriptor internals on JDK 21.
+        unitTests.all { it.jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED", "--add-exports=java.base/jdk.internal.access=ALL-UNNAMED") }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -64,7 +69,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.adaptive.layout)
-    implementation(libs.androidx.compose.icons)
+    implementation(libs.androidx.compose.navigation.suite)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.preview)
     debugImplementation(libs.androidx.compose.tooling)
@@ -79,6 +84,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.json)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.compose.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.test)
     debugImplementation(libs.androidx.compose.test.manifest)

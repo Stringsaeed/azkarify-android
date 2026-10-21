@@ -59,6 +59,9 @@ class JourneyProgress(encoded: String = "{}") {
         if (remainder == 33) award("$day|counter|${UUID.randomUUID()}", 1)
     }
 
+    /** Counts left until the counter's next point (one point per 33 counts). */
+    fun countsToNextPoint() = 33 - payload.optInt("counterTapRemainder", 0).coerceIn(0, 32)
+
     fun completeSlideshow(day: String, categoryId: Int) {
         award("$day|slideshow|$categoryId", 30)
     }
