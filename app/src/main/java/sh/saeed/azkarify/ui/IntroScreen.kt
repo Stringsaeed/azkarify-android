@@ -83,9 +83,11 @@ fun IntroScreen(state: AppState, finish: () -> Unit) {
         )
         HorizontalPager(pager, Modifier.weight(1f), beyondViewportPageCount = 0) { index ->
             val page = pages[index]
+            // Centred in the space above the dots; it still scrolls when the page is too short.
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(
                 Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = AzSpace.gutter),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -101,6 +103,7 @@ fun IntroScreen(state: AppState, finish: () -> Unit) {
                     Text(page.title, Modifier.semantics { heading() }, style = Az.type.display, color = colors.ink)
                     Text(page.body, style = Az.type.body, color = colors.inkSoft)
                 }
+            }
             }
         }
         Row(
