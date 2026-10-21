@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Themed-icon silhouette: the eight-point mosaic seal with the crescent cut out. Drawn on the
+     108dp adaptive canvas, inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+    <group android:scaleX="0.85" android:scaleY="0.85" android:pivotX="512" android:pivotY="512">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M512 136 628 248H768V388L880 512 768 636V776H628L512 888 396 776H256V636L144 512 256 388V248H396Z M560 332a190 190 0 1 0 130 316a160 160 0 0 1 -130 -316Z" />
+    </group>
+</vector>
