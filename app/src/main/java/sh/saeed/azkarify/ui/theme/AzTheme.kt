@@ -18,6 +18,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -66,6 +67,10 @@ object Az {
     val reduceMotion: Boolean
         @Composable @ReadOnlyComposable get() = LocalAzReduceMotion.current
 }
+
+/** Outline of stamped elements: `ink` by day, `line-strong` at night (the shadow turns black). */
+val AzColors.stampLine: Color
+    get() = if (isDark) lineStrong else ink
 
 fun azColors(dark: Boolean, accent: AzAccent): AzColors {
     val base = if (dark) AzNightColors else AzDayColors
